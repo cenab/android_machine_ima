@@ -4,14 +4,18 @@ FROM tracer0tong/android-emulator:latest
 # Set environment variables for the Android SDK and emulator
 ENV ANDROID_HOME=/opt/android-sdk-linux \
     EMULATOR_NAME=android-19 \
-    ARCH=x86
-    
+    ARCH=x86 \
+    APK_DIR=/apks
+
 # Expose the necessary ports for ADB and VNC
 EXPOSE 22 5037 5554 5555 5900
 
 # Copy the script into the Docker container
 COPY slack_interaction.sh /usr/local/bin/slack_interaction.sh
 COPY client.py /usr/local/bin/client.py
+
+# Copy APK files into the container
+COPY ./install_ima_apk/apks $APK_DIR
 
 # Make the scripts executable
 RUN chmod +x /usr/local/bin/slack_interaction.sh
@@ -27,6 +31,14 @@ RUN apt-get update && apt-get install -y \
 
 # Install Python dependencies
 RUN pip3 install websockets json uuid asyncio
+
+# Script to install all APKs in the specified directory
+RUN for apk in $APK_DIR/*.apk; do \
+      if [ -f "$apk" ]; then \
+        echo "Installing $apk"; \
+        adb install "$apk"; \
+      fi; \
+    done
 
 # Set the entry point to start the emulator, run the shell script, and execute the Python client
 ENTRYPOINT ["sh", "-c", "start-emulator && adb wait-for-device && /usr/local/bin/slack_interaction.sh && python3 /usr/local/bin/client.py"]
