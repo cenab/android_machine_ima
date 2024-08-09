@@ -14,7 +14,7 @@ def call_shell_function(function_name, *args):
         print(f"{function_name} executed successfully: {result.stdout}")
     return result.stdout, result.stderr
 
-
+#TODO: Implement the following functions better for extensive management of the user interaction functions
 def open_general_chat_from_home_screen(channel):
     return call_shell_function('openGeneralChatFromHomeScreen', channel)
 

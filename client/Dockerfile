@@ -8,17 +8,29 @@ ENV ANDROID_HOME=/opt/android-sdk-linux \
     APK_DIR=/apks
 
 # Expose the necessary ports for ADB and VNC
-EXPOSE 22 5037 5554 5555 5900
+# 22: Typically used for SSH access (though not used in this specific Dockerfile).
+# 5037: Used by ADB (Android Debug Bridge) to communicate with the emulator.
+# 5554 and 5555: Used for the emulator’s console and ADB connections.
+# 5900: Used for VNC (Virtual Network Computing) to access the emulator’s GUI.
+# 5000: Custom port for the Python client to communicate with the emulator.
+EXPOSE 22 5037 5554 5555 5900 5000
 
-# Copy the script into the Docker container
-COPY slack_interaction.sh /usr/local/bin/slack_interaction.sh
-COPY client.py /usr/local/bin/client.py
+# Create a directory for the interaction scripts
+RUN mkdir -p /usr/local/bin/interaction_scripts
+
+# Copy interaction scripts into the Docker container
+COPY ./commands/user_interaction_functions/*.sh /usr/local/bin/interaction_scripts/
+
+# Copy other necessary scripts into the Docker container
+COPY ./collect_ports/collect_ports.sh /usr/local/bin/collect_ports.sh
+COPY ./collection_tcp/start_tcpdump.sh /usr/local/bin/start_tcpdump.sh
+COPY ./client.py /usr/local/bin/client.py
 
 # Copy APK files into the container
 COPY ./install_ima_apk/apks $APK_DIR
 
 # Make the scripts executable
-RUN chmod +x /usr/local/bin/slack_interaction.sh
+RUN chmod +x /usr/local/bin/*.sh /usr/local/bin/interaction_scripts/*.sh
 
 # Install Python and additional tools
 RUN apt-get update && apt-get install -y \
@@ -40,8 +52,8 @@ RUN for apk in $APK_DIR/*.apk; do \
       fi; \
     done
 
-# Set the entry point to start the emulator, run the shell script, and execute the Python client
-ENTRYPOINT ["sh", "-c", "start-emulator && adb wait-for-device && /usr/local/bin/slack_interaction.sh && python3 /usr/local/bin/client.py"]
+# Set the entry point to start the emulator, wait for it to boot, run all interaction scripts, collect ports, start tcpdump, and finally execute the Python client
+ENTRYPOINT ["sh", "-c", "start-emulator && adb wait-for-device && for script in /usr/local/bin/interaction_scripts/*.sh; do adb shell sh $script; done && adb shell 'sh /system/bin/collect_ports.sh' && adb shell 'sh /system/bin/start_tcpdump.sh' && python3 /usr/local/bin/client.py"]
 
 # Start the emulator with specific parameters (customize as needed)
 CMD ["-no-boot-anim", "-no-window", "-gpu", "off", "-memory", "2048", "-avd", "$EMULATOR_NAME"]
