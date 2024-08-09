@@ -129,10 +129,5 @@ check_keyboard() {
     fi
 }
 
-# Example usage
-add_task_to_queue "open_general_chat_from_home_screen 'General Chat'"
-add_task_to_queue "post_message_to_the_chat 'Hello, team! This is an automated message.'"
-add_task_to_queue "return_to_home_screen"
-
 # Process the queued tasks
 process_queue
