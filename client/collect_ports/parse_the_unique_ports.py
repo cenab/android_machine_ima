@@ -5,37 +5,46 @@ unique_ips = set()
 # Optionally exclude common ports that may not be relevant for filtering
 excluded_ports = {'443'}
 
-# Open the file and read its contents
-with open('netstat_output.txt', 'r') as file:
-    # Iterate over each line in the file
-    for line in file:
-        
-        # Skip lines that don't contain the expected data format
-        if 'tcp6' not in line and 'udp' not in line:
-            continue
+# List of application-specific output files
+files = [
+    'Slack_output.txt', 'Discord_output.txt', 'RocketChat_output.txt',
+    'Teams_output.txt', 'Textnow_output.txt', 'Messenger_output.txt',
+    'Signal_output.txt', 'Snapchat_output.txt', 'Telegram_output.txt',
+    'WhatsApp_output.txt'
+]
 
-        # Split the line by spaces and filter out empty strings
-        parts = [part for part in line.split(' ') if part]
-        print(line)
-        print(parts)
-        # Extract the local and remote address parts
-        local_address_part = parts[5]
-        remote_address_part = parts[6]
+# Function to process address part and extract IP and port
+def process_address(address_part):
+    if ':' in address_part:
+        ip_part, port_part = address_part.rsplit(':', 1)
+        # Remove any non-numeric characters from the port part
+        port = ''.join(filter(str.isdigit, port_part))
+        if port and port not in excluded_ports:
+            unique_ports.add(port)
+        if ip_part:
+            unique_ips.add(ip_part.split(':')[-1])
 
-        # Function to process address part and extract IP and port
-        def process_address(address_part):
-            if ':' in address_part:
-                ip_part, port_part = address_part.rsplit(':', 1)
-                # Remove any non-numeric characters from the port part
-                port = ''.join(filter(str.isdigit, port_part))
-                if port and port not in excluded_ports:
-                    unique_ports.add(port)
-                if ip_part:
-                    unique_ips.add(ip_part.split(':')[-1])
+# Iterate over each application's output file
+for filename in files:
+    # Open the file and read its contents
+    with open(filename, 'r') as file:
+        # Iterate over each line in the file
+        for line in file:
+            
+            # Skip lines that don't contain the expected data format
+            if 'tcp6' not in line and 'udp' not in line:
+                continue
 
-        # Process both local and remote addresses
-        process_address(local_address_part)
-        process_address(remote_address_part)
+            # Split the line by spaces and filter out empty strings
+            parts = [part for part in line.split(' ') if part]
+
+            # Extract the local and remote address parts
+            local_address_part = parts[5]
+            remote_address_part = parts[6]
+
+            # Process both local and remote addresses
+            process_address(local_address_part)
+            process_address(remote_address_part)
 
 # Convert the sets to lists and sort them
 unique_ports_list = sorted(list(unique_ports), key=lambda x: int(x))
