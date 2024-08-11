@@ -1,18 +1,19 @@
+import logging
 from flask import Flask, request, jsonify
-from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO, emit, disconnect
 from queue import Queue
 import threading
+import uuid
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins='*')
 
-# Queue to manage command execution
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 command_queue = Queue()
-
-# Dictionary to store the status of each emulator
 device_status = {}
-
-# Lock for thread-safe access to shared resources
+device_queues = {}
 lock = threading.Lock()
 
 @app.route('/')
@@ -21,48 +22,56 @@ def index():
 
 @app.route('/add_command', methods=['POST'])
 def add_command():
-    data = request.json
-    device_id = data['device_id']
-    command = data['command']
-    # Add command to the queue
-    with lock:
-        command_queue.put((device_id, command))
-    return jsonify({"status": "Command added to queue"}), 200
-
-def process_commands():
-    while True:
-        # Get a command from the queue
-        device_id, command = command_queue.get()
+    try:
+        data = request.json
+        device_id = data['device_id']
+        command = data['command']
+        command_id = str(uuid.uuid4())
         with lock:
-            # Check if the device is ready to execute a command
-            if device_status.get(device_id) == 'ready':
-                # Emit command to device via WebSocket
-                socketio.emit('execute_command', {'device_id': device_id, 'command': command})
-                # Set device status to busy
-                device_status[device_id] = 'busy'
+            if device_id not in device_queues:
+                device_queues[device_id] = Queue()
+            device_queues[device_id].put((command_id, command))
+        logger.info(f"Command added to queue for device {device_id}")
+        return jsonify({"status": "Command added to queue", "command_id": command_id}), 200
+    except Exception as e:
+        logger.error(f"Error adding command: {str(e)}")
+        return jsonify({"error": "Failed to add command"}), 400
 
 @socketio.on('connect')
 def handle_connect():
     device_id = request.args.get('device_id')
     with lock:
         device_status[device_id] = 'ready'
+    logger.info(f"Device {device_id} connected")
     emit('status', {'status': 'Connected to server'})
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    device_id = request.args.get('device_id')
+    with lock:
+        if device_id in device_status:
+            del device_status[device_id]
+        if device_id in device_queues:
+            del device_queues[device_id]
+    logger.info(f"Device {device_id} disconnected")
 
 @socketio.on('command_result')
 def handle_command_result(data):
     device_id = data['device_id']
+    command_id = data['command_id']
     result = data['result']
     with lock:
-        # Update device status
         device_status[device_id] = 'ready'
-    # Process the result (success/failure) of the command
-    print(f"Command result from {device_id}: {result}")
+    logger.info(f"Command {command_id} result from {device_id}: {result}")
+    send_next_command(device_id)
 
-def start_command_processing_thread():
-    thread = threading.Thread(target=process_commands)
-    thread.daemon = True
-    thread.start()
+def send_next_command(device_id):
+    with lock:
+        if device_id in device_queues and not device_queues[device_id].empty():
+            command_id, command = device_queues[device_id].get()
+            socketio.emit('execute_command', {'device_id': device_id, 'command_id': command_id, 'command': command})
+            device_status[device_id] = 'busy'
+            logger.info(f"Sent command {command_id} to device {device_id}")
 
 if __name__ == '__main__':
-    start_command_processing_thread()
-    socketio.run(app, host='0.0.0.0', port=5000)
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
