@@ -1,6 +1,6 @@
 # Provider configuration
 provider "aws" {
-  region = "us-west-2"  # Change this to your preferred region
+  region = var.aws_region
 }
 
 # Variables
@@ -19,6 +19,18 @@ variable "ssh_location" {
   description = "The IP address range that can be used to SSH to the EC2 instances"
   type        = string
   default     = "0.0.0.0/0"
+}
+
+variable "aws_region" {
+  description = "AWS region"
+  type        = string
+  default     = "us-west-2"
+}
+
+variable "client_count" {
+  description = "Number of client instances to create"
+  type        = number
+  default     = 5
 }
 
 # VPC
@@ -71,8 +83,8 @@ resource "aws_route_table_association" "android_orchestrator_public_rt_assoc" {
 
 # Security Group
 resource "aws_security_group" "android_orchestrator_sg" {
-  name        = "AndroidOrchestratorServerSG"
-  description = "Security group for Android Orchestrator server"
+  name        = "AndroidOrchestratorSG"
+  description = "Security group for Android Orchestrator"
   vpc_id      = aws_vpc.android_orchestrator_vpc.id
 
   ingress {
@@ -97,32 +109,101 @@ resource "aws_security_group" "android_orchestrator_sg" {
   }
 }
 
-# EC2 Instance
-resource "aws_instance" "android_orchestrator_server" {
-  ami           = "ami-0c55b159cbfafe1f0"  # Amazon Linux 2 AMI (HVM), SSD Volume Type
-  instance_type = var.instance_type
-  key_name      = var.key_name
+# ECR Repositories
+resource "aws_ecr_repository" "android_orchestrator" {
+  name = "android-orchestrator"
+}
 
-  vpc_security_group_ids = [aws_security_group.android_orchestrator_sg.id]
-  subnet_id              = aws_subnet.android_orchestrator_public_subnet.id
+resource "aws_ecr_repository" "android_client" {
+  name = "android-client"
+}
 
-  user_data = base64encode(<<-EOF
-              #!/bin/bash
-              yum update -y
-              yum install -y docker git python3 python3-pip
-              systemctl start docker
-              systemctl enable docker
-              usermod -a -G docker ec2-user
-              pip3 install flask flask-socketio
-              git clone https://github.com/yourusername/android-machine-orchestrator.git
-              cd android-machine-orchestrator
-              docker build -t android-orchestrator .
-              docker run -d -p 5000:5000 android-orchestrator
-              EOF
-  )
+# ECS Cluster
+resource "aws_ecs_cluster" "android_orchestrator" {
+  name = "android-orchestrator-cluster"
+}
 
-  tags = {
-    Name = "AndroidOrchestratorServer"
+# ECS Task Definition for Orchestrator
+resource "aws_ecs_task_definition" "orchestrator" {
+  family                   = "android-orchestrator-server"
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = "256"
+  memory                   = "512"
+
+  container_definitions = jsonencode([{
+    name  = "orchestrator"
+    image = "${aws_ecr_repository.android_orchestrator.repository_url}:latest"
+    portMappings = [{
+      containerPort = 5000
+      hostPort      = 5000
+    }]
+    command = ["python", "orchestrator/server.py"]
+  }])
+}
+
+# ECS Task Definition for Client
+resource "aws_ecs_task_definition" "client" {
+  family                   = "android-orchestrator-client"
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = "256"
+  memory                   = "512"
+
+  container_definitions = jsonencode([{
+    name  = "client"
+    image = "${aws_ecr_repository.android_client.repository_url}:latest"
+    command = ["python", "client/client.py"]
+  }])
+}
+
+# ECS Service for Orchestrator
+resource "aws_ecs_service" "orchestrator" {
+  name            = "android-orchestrator-server"
+  cluster         = aws_ecs_cluster.android_orchestrator.id
+  task_definition = aws_ecs_task_definition.orchestrator.arn
+  launch_type     = "FARGATE"
+  desired_count   = 1
+
+  network_configuration {
+    subnets          = [aws_subnet.android_orchestrator_public_subnet.id]
+    assign_public_ip = true
+    security_groups  = [aws_security_group.android_orchestrator_sg.id]
+  }
+}
+
+# ECS Service for Clients
+resource "aws_ecs_service" "client" {
+  name            = "android-orchestrator-client"
+  cluster         = aws_ecs_cluster.android_orchestrator.id
+  task_definition = aws_ecs_task_definition.client.arn
+  launch_type     = "FARGATE"
+  desired_count   = var.client_count
+
+  network_configuration {
+    subnets          = [aws_subnet.android_orchestrator_public_subnet.id]
+    assign_public_ip = true
+    security_groups  = [aws_security_group.android_orchestrator_sg.id]
+  }
+}
+
+# Null resource to build and push Docker images
+resource "null_resource" "docker_builds" {
+  triggers = {
+    orchestrator_dockerfile = filemd5("${path.module}/orchestrator/Dockerfile")
+    client_dockerfile      = filemd5("${path.module}/client/Dockerfile")
+  }
+
+  provisioner "local-exec" {
+    command = <<EOF
+      aws ecr get-login-password --region ${var.aws_region} | docker login --username AWS --password-stdin ${aws_ecr_repository.android_orchestrator.repository_url}
+      docker build -t ${aws_ecr_repository.android_orchestrator.repository_url}:latest -f orchestrator/Dockerfile ./orchestrator
+      docker push ${aws_ecr_repository.android_orchestrator.repository_url}:latest
+
+      aws ecr get-login-password --region ${var.aws_region} | docker login --username AWS --password-stdin ${aws_ecr_repository.android_client.repository_url}
+      docker build -t ${aws_ecr_repository.android_client.repository_url}:latest -f client/Dockerfile ./client
+      docker push ${aws_ecr_repository.android_client.repository_url}:latest
+    EOF
   }
 }
 
@@ -132,12 +213,27 @@ data "aws_availability_zones" "available" {
 }
 
 # Outputs
-output "server_public_ip" {
-  description = "Public IP address of the Android Orchestrator server"
-  value       = aws_instance.android_orchestrator_server.public_ip
+output "orchestrator_repository_url" {
+  description = "The URL of the ECR repository for the orchestrator"
+  value       = aws_ecr_repository.android_orchestrator.repository_url
 }
 
-output "server_public_dns" {
-  description = "Public DNS name of the Android Orchestrator server"
-  value       = aws_instance.android_orchestrator_server.public_dns
+output "client_repository_url" {
+  description = "The URL of the ECR repository for the client"
+  value       = aws_ecr_repository.android_client.repository_url
+}
+
+output "ecs_cluster_name" {
+  description = "The name of the ECS cluster"
+  value       = aws_ecs_cluster.android_orchestrator.name
+}
+
+output "orchestrator_service_name" {
+  description = "The name of the ECS service running the orchestrator"
+  value       = aws_ecs_service.orchestrator.name
+}
+
+output "client_service_name" {
+  description = "The name of the ECS service running the clients"
+  value       = aws_ecs_service.client.name
 }
