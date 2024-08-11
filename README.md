@@ -67,3 +67,63 @@ Due to technical limitations, we aim to replicate the local network environment 
    ```bash
    git clone https://github.com/yourusername/android-machine-orchestrator.git
    cd android-machine-orchestrator
+
+2. **Set Up the Environment**:
+
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate
+   pip install -r requirements.txt
+   ```
+
+3. **Configure AWS Credentials**:
+
+   Set up your AWS credentials according to AWS CLI configuration guidelines.
+
+4. **Deploy the Infrastructure**:
+
+   ```bash
+   cd terraform
+   terraform init
+   terraform apply
+   ```
+
+5. **Start the Orchestrator**:
+
+   ```bash
+   python orchestrator/server.py
+   ```
+
+6. **Launch Emulators**:
+
+   ```bash
+   python launch_emulators.py
+   ```
+
+## To-Do List
+
+- [ ] Implement the Python Flask server with WebSocket communication
+  - [ ] Refine and test the server code in orchestrator/server.py
+- [ ] Develop the ADB and WebSocket integration for each Android device
+  - [ ] Expand client/client.py to include ADB script execution
+- [ ] Modify scripts to return success or failure responses
+  - [ ] Update scripts in client/commands/user_interaction_functions/
+- [ ] Implement SCP (Secure Copy Protocol) functionality
+  - [ ] Add code to transfer tcp dumps and IMA ports from emulators to server
+- [ ] Complete the setup and installation process
+  - [ ] Finish writing setup instructions in README.md
+  - [ ] Create necessary setup scripts
+- [ ] Implement the master-slave architecture
+  - [ ] Enhance server and client code to support master-slave model
+- [ ] Develop a more robust queuing system and command verification
+  - [ ] Improve queue implementation in server and client code
+- [ ] Optimize performance
+  - [ ] Review and optimize emulator configurations and orchestration script
+- [ ] Implement cloud deployment
+  - [ ] Develop scripts or instructions for AWS deployment
+- [ ] Enhance data collection and analysis
+  - [ ] Improve client/collect_ports/parse_the_unique_ports.py script
+- [ ] Implement extensive testing
+  - [ ] Develop and run tests for multiple emulators and IMAs
+- [ ] Documentation
+  - [ ] Complete documentation for setup, running, and maintenance
