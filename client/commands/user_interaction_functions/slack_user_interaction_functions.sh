@@ -7,11 +7,9 @@ check_adb_success() {
     local message="$3"
 
     if [ $status -eq 0 ]; then
-        echo "$message: Success"
+        echo "{\"status\": \"success\", \"message\": \"$message: Success\"}"
     else
-        echo "$message: Failed"
-        echo "Output: $output"
-        exit 1  # Exit or handle failure appropriately
+        echo "{\"status\": \"failure\", \"message\": \"$message: Failed\", \"error\": \"$output\"}"
     fi
 }
 
@@ -25,13 +23,18 @@ add_task_to_queue() {
 
 # Function to process the queue
 process_queue() {
+    local results=()
     for task in "${task_queue[@]}"; do
         echo "Processing task: $task"
-        eval "$task"
+        result=$(eval "$task")
+        results+=("$result")
     done
 
     # Clear the queue after processing
     task_queue=()
+
+    # Return all results as a JSON array
+    echo "{\"results\": [$(IFS=,; echo "${results[*]}")]}"
 }
 
 # Function to automate Slack interactions
@@ -42,33 +45,41 @@ open_general_chat_from_home_screen() {
 
     echo "Starting from home screen..."
     output=$(adb shell input keyevent KEYCODE_HOME 2>&1)
-    check_adb_success $? "$output" "Return to Home Screen"
+    result=$(check_adb_success $? "$output" "Return to Home Screen")
+    [ $(echo "$result" | jq -r .status) == "failure" ] && echo "$result" && return
 
     # Wait for home screen to be ready
     wait_for_home_screen
 
     echo "Opening Slack..."
     output=$(adb shell am start -n com.Slack/slack.features.home.HomeActivity 2>&1)
-    check_adb_success $? "$output" "Open Slack"
+    result=$(check_adb_success $? "$output" "Open Slack")
+    [ $(echo "$result" | jq -r .status) == "failure" ] && echo "$result" && return
 
     # Wait for Slack to open
     wait_for_activity "slack.features.home.HomeActivity"
 
     echo "Opening DMs channel..."
     output=$(adb shell input tap 330 2180 2>&1)
-    check_adb_success $? "$output" "Open DMs Channel"
+    result=$(check_adb_success $? "$output" "Open DMs Channel")
+    [ $(echo "$result" | jq -r .status) == "failure" ] && echo "$result" && return
 
     echo "Opening DMs search..."
     output=$(adb shell input tap 572 403 2>&1)
-    check_adb_success $? "$output" "Open DMs Search"
+    result=$(check_adb_success $? "$output" "Open DMs Search")
+    [ $(echo "$result" | jq -r .status) == "failure" ] && echo "$result" && return
 
     echo "Adding DM search input..."
     output=$(adb shell input text "'$formatted_channel'" 2>&1)
-    check_adb_success $? "$output" "Add DM Search Input"
+    result=$(check_adb_success $? "$output" "Add DM Search Input")
+    [ $(echo "$result" | jq -r .status) == "failure" ] && echo "$result" && return
 
     echo "Opening general channel..."
     output=$(adb shell input tap 260 423 2>&1)
-    check_adb_success $? "$output" "Open General Channel"
+    result=$(check_adb_success $? "$output" "Open General Channel")
+    [ $(echo "$result" | jq -r .status) == "failure" ] && echo "$result" && return
+
+    echo "{\"status\": \"success\", \"message\": \"General chat opened successfully\"}"
 }
 
 # Function to post a message to the chat
@@ -81,15 +92,20 @@ post_message_to_the_chat() {
 
     # Clicks on the text box
     output=$(adb shell input tap 550 2200 2>&1)
-    check_adb_success $? "$output" "Click Text Box"
+    result=$(check_adb_success $? "$output" "Click Text Box")
+    [ $(echo "$result" | jq -r .status) == "failure" ] && echo "$result" && return
 
     # Writes your text
     output=$(adb shell input text "'$formatted_message'" 2>&1)
-    check_adb_success $? "$output" "Write Text"
+    result=$(check_adb_success $? "$output" "Write Text")
+    [ $(echo "$result" | jq -r .status) == "failure" ] && echo "$result" && return
 
     # Clicks on send button
     output=$(adb shell input tap 1000 1450 2>&1)
-    check_adb_success $? "$output" "Click Send Button"
+    result=$(check_adb_success $? "$output" "Click Send Button")
+    [ $(echo "$result" | jq -r .status) == "failure" ] && echo "$result" && return
+
+    echo "{\"status\": \"success\", \"message\": \"Message posted successfully\"}"
 }
 
 # Function to return to the home screen
@@ -105,7 +121,7 @@ wait_for_home_screen() {
     until adb shell dumpsys window | grep -m 1 'mCurrentFocus=Window{.*StatusBar};'; do
         sleep 0.5
     done
-    echo "Home screen is ready."
+    echo "{\"status\": \"success\", \"message\": \"Home screen is ready\"}"
 }
 
 # Function to wait for a specific activity
@@ -115,7 +131,7 @@ wait_for_activity() {
     until adb shell dumpsys window | grep -m 1 "mCurrentFocus=Window{.*$activity}"; do
         sleep 0.5
     done
-    echo "$activity is ready."
+    echo "{\"status\": \"success\", \"message\": \"$activity is ready\"}"
 }
 
 # Function to check if the keyboard is shown
@@ -124,8 +140,9 @@ check_keyboard() {
 
     if [ "$KEYBOARD_STATUS" = "true" ]; then
         adb shell input keyevent KEYCODE_BACK
+        echo "{\"status\": \"success\", \"message\": \"Keyboard hidden\"}"
     else
-        echo "Keyboard is not shown."
+        echo "{\"status\": \"success\", \"message\": \"Keyboard is not shown\"}"
     fi
 }
 
