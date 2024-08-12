@@ -15,11 +15,11 @@ ENV ANDROID_HOME=/opt/android-sdk-linux \
 # 5000: Custom port for the Python client to communicate with the emulator.
 EXPOSE 22 5037 5554 5555 5900 5000
 
-# Create a directory for the interaction scripts
-RUN mkdir -p /usr/local/bin/interaction_scripts
-
 # Copy interaction scripts into the Docker container
 COPY ./commands/user_interaction_functions/*.sh /usr/local/bin/interaction_scripts/
+
+# Create a directory for the interaction scripts
+RUN mkdir -p /usr/local/bin/interaction_scripts
 
 # Copy other necessary scripts into the Docker container
 COPY ./collect_ports/collect_ports.sh /usr/local/bin/collect_ports.sh
