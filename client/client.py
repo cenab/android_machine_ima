@@ -48,5 +48,6 @@ async def run_interaction_script(script_name):
         return {"status": "failure", "error": str(e), "output": e.stderr}
 
 if __name__ == "__main__":
+    print("Starting client")
     device_id = str(uuid.uuid4())
     asyncio.get_event_loop().run_until_complete(connect_to_server(device_id))

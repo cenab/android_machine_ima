@@ -1,4 +1,5 @@
 emulator -avd Pixel_4a_Edited_API_33 -writable-system
+emulator -avd test_avd -no-window -no-snapshot -wipe-data -accel off
 adb root
 adb shell whoami
 adb remount
