@@ -144,16 +144,9 @@ resource "google_compute_instance" "orchestrator" {
     git sparse-checkout set orchestrator
     git checkout main
 
-    # Build and run the Docker container
+    # Run the orchestrator
     cd orchestrator
-    docker build -t ima-orchestrator -f Dockerfile .
-    docker run -d ima-orchestrator
-
-    # Set up Android environment and launch Cuttlefish
-    cd ../aosp/
-    source build/envsetup.sh
-    lunch 16
-    launch_cvd &
+    ./run.sh
   EOF
 
   service_account {
@@ -195,16 +188,10 @@ resource "google_compute_instance" "client" {
     git sparse-checkout set client
     git checkout main
 
-    # Build and run the Docker container
+    # Run the client
     cd client
-    docker build -t ima-client -f Dockerfile .
-    docker run -d ima-client
-
-    # Set up Android environment and launch Cuttlefish
-    cd ../aosp/
-    source build/envsetup.sh
-    lunch 16
-    launch_cvd &
+    ./run.sh
+    
   EOF
 
   service_account {
