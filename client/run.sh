@@ -80,11 +80,6 @@ run_python_client() {
   fi
 }
 
-# Function to keep the container running
-keep_running() {
-  tail -f /dev/null
-}
-
 # Main script execution
 start_emulator
 wait_for_boot
@@ -92,4 +87,3 @@ install_apks
 run_interaction_scripts
 run_data_collection
 run_python_client
-keep_running
