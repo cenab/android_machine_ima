@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Define paths
 APP_DIR=~/path/to/app  # Update this to the actual path of your app directory
 REQUIREMENTS_FILE="$APP_DIR/requirements.txt"

@@ -17,7 +17,7 @@ start_emulator() {
   cd "$AOSP_DIR" || exit
   source build/envsetup.sh
   lunch 16
-  launch_cvd & disown  # This runs in the background
+  launch_cvd -daemon
   echo "Emulator launched, continuing with the script..."
 }
 
@@ -37,6 +37,19 @@ wait_for_boot() {
 
 # Function to install APKs
 install_apks() {
+  # Download files
+  cd "$APK_DIR"
+  download_file "1P1VsP6Vi1ft96rNdwDLjz7UnRVY5Z_3e"
+  download_file "1RRkxAwtwTlZKLeqZ-IUnJHn2WWe-cVW0"
+  download_file "1YKNj6ER1-JOWTeVPgGwrB2iWs4Drm6eZ"
+  download_file "1ZmqG0bi17L-20GqpEf4cvSahhwvLlSrE"
+  download_file "1_8x-aZWcMhaHRaF2bQu-IoSk_c1aIPkb"
+  download_file "1_PTTnVGmYEtDNBVs-h0G6aaBFiPCj5q7"
+  download_file "1_nuSa289S0d_2d5tdzjwGEMr17yvI5pj"
+  download_file "1oTE9SK-xVXatyZGjsLuF8tqNpDrqTdkj"
+  download_file "1vfF4ivMO08KZrK0GRM2q3AVaRnJOsM4P"
+  download_file "1w1C_cLlSHhKhTzQkrL2FCXef9bJU2zAU"
+
   for apk in "$APK_DIR"/*.apk; do
     if [ -f "$apk" ]; then
       echo "Installing $apk"
@@ -48,6 +61,7 @@ install_apks() {
       fi
     fi
   done
+  cd ~
 }
 
 # Function to run interaction scripts
@@ -77,6 +91,22 @@ run_python_client() {
     echo "Python client ran successfully."
   else
     echo "Failed to run Python client."
+  fi
+}
+
+download_file() {
+  FILE_ID="$1"
+
+  # Construct the Google Drive download link
+  DOWNLOAD_LINK="https://drive.google.com/uc?id=${FILE_ID}"
+
+  # Use gdown to download the file
+  gdown "$DOWNLOAD_LINK"
+
+  # Check if the download was successful
+  if [ $? -ne 0 ]; then
+      echo "Failed to download file with ID: $FILE_ID"
+      exit 1
   fi
 }
 
