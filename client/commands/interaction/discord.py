@@ -1,32 +1,44 @@
 import os
 
+def run_adb_command(command):
+    os.system(command)
+
 def launch_app():
-    os.system("adb shell input keyevent KEYCODE_HOME")
-    os.system("adb shell monkey -p com.discord -c android.intent.category.LAUNCHER 1")
+    """ Launches the Discord app. """
+    run_adb_command("adb shell input keyevent KEYCODE_HOME")
+    run_adb_command("adb shell monkey -p com.discord -c android.intent.category.LAUNCHER 1")
 
-def input_email(email="batu.bora389@gmail.com"):
-    os.system(f'adb shell input text "{email}"')
-
-def tap_login():
-    os.system("adb shell input tap 550 2150")  # login
-
-def tap_email():
-    os.system("adb shell input tap 428 588")    # email
-
-def tap_password():
-    os.system("adb shell input tap 250 750")    # password
-
-def tap_login_enter():
-    os.system("adb shell input tap 531 1082")    # login_enter
+def fill_textbar(text):
+    """ Fills the textbar with the specified text. """
+    run_adb_command("adb shell input keycombination 113 29 && adb shell input keyevent 67")
+    run_adb_command(f'adb shell input text "{text}"')
 
 def tap_click_on_server():
-    os.system("adb shell input tap 90 343")      # click_on_server
+    """ Taps to click on the server. """
+    run_adb_command("adb shell input tap 90 343")
 
 def tap_click_on_channel():
-    os.system("adb shell input tap 495 587")     # click_on_channel
+    """ Taps to click on the channel. """
+    run_adb_command("adb shell input tap 495 587")
 
 def tap_click_on_message_box():
-    os.system("adb shell input tap 444 2136")    # click_on_message_box
+    """ Taps to click on the message box. """
+    run_adb_command("adb shell input tap 444 2136")
 
-def tap_returning_back():
-    os.system("adb shell input tap 531 1359")    # returning-back-from-home-screen-message-box
+def tap_send():
+    """ Taps to return back from the home screen message box. """
+    run_adb_command("adb shell input tap 531 1359")
+
+def click_send_button():
+    """ Sends message by pressing enter. """
+    run_adb_command("adb shell input keyevent 66")
+
+def send_discord_message(message, executed):
+    """ Sends a message to the Discord channel. """
+    launch_app()
+    if not executed:
+        tap_click_on_server()
+        tap_click_on_channel()
+    tap_click_on_message_box()
+    fill_textbar(message)
+    click_send_button()

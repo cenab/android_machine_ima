@@ -19,6 +19,8 @@ start_emulator() {
   lunch 16
   launch_cvd -daemon
   echo "Emulator launched, continuing with the script..."
+  adb devices
+  adb shell pm disable-user --user 0 com.android.inputmethod.latin
 }
 
 # Function to wait for the emulator to boot
