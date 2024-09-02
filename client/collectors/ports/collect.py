@@ -102,15 +102,3 @@ class NetworkStatsCollector:
             self.process.join()
             self.process = None
             self.stop_event.clear()
-
-if __name__ == "__main__":
-    collector = NetworkStatsCollector()
-    collector.start()
-    
-    # The main program can continue doing other tasks, or just wait for user input to stop the collector
-    try:
-        while True:
-            time.sleep(1)
-    except KeyboardInterrupt:
-        collector.stop()
-        print("Network stats collection stopped.")
