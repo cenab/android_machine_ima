@@ -12,7 +12,7 @@ from client.commands.slack import send_slack_message
 from client.commands.teams import send_teams_message
 from client.commands.telegram import send_telegram_message
 from client.commands.whatsapp import send_whatsapp_message
-from client.collectors.tcp.dump import TcpDumpManager, run_tcpdump
+from client.collectors.tcp.dump import TcpDumpManager
 from client.collectors.ports.collect import NetworkStatsCollector
 
 async def connect_to_server(device_id, port_collector, tcpdump_manager):
