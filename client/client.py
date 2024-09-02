@@ -9,6 +9,9 @@ from client.commands.messenger import send_messenger_message
 from client.commands.signal import send_signal_message
 from client.commands.skype import send_skype_message
 from client.commands.slack import send_slack_message
+from client.commands.teams import send_teams_message
+from client.commands.telegram import send_telegram_message
+from client.commands.whatsapp import send_whatsapp_message
 from client.collectors.tcp.dump import TcpDumpManager, run_tcpdump
 from client.collectors.ports.collect import NetworkStatsCollector
 
@@ -49,8 +52,8 @@ async def execute_command(command):
     """
     try:
         # Ensure the command is safe to execute
-        sanitized_command = shlex.split(command)
-        result = post_message_to_the_chat(sanitized_command)
+        command = JSON.dumps(command)
+        result = post_message_to_the_chat(command.get('message'), command.get('platform'), executed=True)
         return {"status": "success", "output": result.stdout}
     except subprocess.CalledProcessError as e:
         return {"status": "failure", "error": str(e), "output": e.stderr}
@@ -67,6 +70,12 @@ def post_message_to_the_chat(message, platform, executed=False):
         return send_skype_message(message, executed)
     elif platform == 'slack':
         return send_slack_message(message, executed)
+    elif platform == 'teams':
+        return send_teams_message(message, executed)
+    elif platform == 'telegram':
+        return send_telegram_message(message, executed)
+    elif platform == 'whatsapp':
+        return send_whatsapp_message(message, executed)
     else:
         print("Unsupported platform")
 
@@ -75,7 +84,7 @@ def stop_collectors(port_collector, tcpdump_manager):
     port_collector.stop()  # Stops the NetworkStatsCollector
     tcpdump_manager.stop_tcpdump()  # Stops the TcpDumpManager
 
-if __name__ == "__main__":
+if _name_ == "_main_":
     print("Starting client")
     device_id = str(uuid.uuid4())
     port_collector = NetworkStatsCollector()
