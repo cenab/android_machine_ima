@@ -1,1 +1,0 @@
-#voip based phone numbers are not accepted
