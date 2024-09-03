@@ -32,9 +32,14 @@ async def click_textbox():
     """Clicks on the text box for input."""
     await run_adb_command("adb shell input tap 340 2119")
 
-async def fill_textbox(text):
-    """Fills the text box with the specified text."""
-    await run_adb_command(f'adb shell input text "{text}"')
+async def fill_textbar(text):
+    """Fills the text bar with the specified text."""
+    # Clear the current text (optional, based on your initial command)
+    await run_adb_command("adb shell input keycombination 113 29 && adb shell input keyevent 67")
+    # Replace spaces with "\ " to properly handle them in ADB shell input
+    formatted_text = text.replace(" ", "\\ ")
+    # Send the formatted text to the device
+    await run_adb_command(f'adb shell input text "{formatted_text}"')
 
 async def click_send_button():
     """Clicks the send button."""
@@ -50,7 +55,7 @@ async def send_skype_message(message, executed):
         if not executed:
             await click_second_conversation()
         await click_textbox()
-        await fill_textbox(message)
+        await fill_textbar(message)
         await click_send_button()
         return True
     except Exception as e:

@@ -24,10 +24,18 @@ async def launch_app():
     await run_adb_command("adb shell input keyevent KEYCODE_HOME")
     await run_adb_command("adb shell monkey -p com.discord -c android.intent.category.LAUNCHER 1")
 
+async def tap_textbar():
+    """Taps the text bar for input."""
+    await run_adb_command("adb shell input tap 626 2136")
+
 async def fill_textbar(text):
-    """ Fills the textbar with the specified text. """
-    await run_adb_command("adb shell input keyevent 67")  # Clear any existing text
-    await run_adb_command(f'adb shell input text "{text}"')
+    """Fills the text bar with the specified text."""
+    # Clear the current text (optional, based on your initial command)
+    await run_adb_command("adb shell input keycombination 113 29 && adb shell input keyevent 67")
+    # Replace spaces with "\ " to properly handle them in ADB shell input
+    formatted_text = text.replace(" ", "\\ ")
+    # Send the formatted text to the device
+    await run_adb_command(f'adb shell input text "{formatted_text}"')
 
 async def tap_click_on_server():
     """ Taps to click on the server. """
@@ -43,7 +51,7 @@ async def tap_click_on_message_box():
 
 async def click_send_button():
     """ Sends message by pressing enter. """
-    await run_adb_command("adb shell input keyevent 66")
+    await run_adb_command("adb shell input tap 987 2124")
 
 async def send_discord_message(message, executed):
     """ Sends a message to the Discord channel. """

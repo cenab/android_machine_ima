@@ -28,10 +28,14 @@ async def click_on_first_messager():
     """Simulates a tap on the screen at the specified coordinates."""
     await run_adb_command("adb shell input tap 428 358")
 
-async def type_message(message):
-    """Types a given message on the device."""
+async def fill_textbar(text):
+    """Fills the text bar with the specified text."""
+    # Clear the current text (optional, based on your initial command)
     await run_adb_command("adb shell input keycombination 113 29 && adb shell input keyevent 67")
-    await run_adb_command(f'adb shell input text "{message}"')
+    # Replace spaces with "\ " to properly handle them in ADB shell input
+    formatted_text = text.replace(" ", "\\ ")
+    # Send the formatted text to the device
+    await run_adb_command(f'adb shell input text "{formatted_text}"')
 
 async def send_message():
     """Simulates a tap on the send button coordinates."""
@@ -41,5 +45,5 @@ async def send_telegram_message(message, executed):
     await launch_app()
     if not executed:
         await click_on_first_messager()
-    await type_message(message)
+    await fill_textbar(message)
     await send_message()
