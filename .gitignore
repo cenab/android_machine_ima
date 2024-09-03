@@ -3,3 +3,4 @@
 *.pem
 terraform.tfvars
 login.txt
+*.xlsx
