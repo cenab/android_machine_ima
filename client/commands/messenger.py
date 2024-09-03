@@ -38,16 +38,17 @@ async def tap_textbar():
 
 async def fill_textbar(text):
     """Fills the text bar with the specified text."""
+    # Clear the current text (optional, based on your initial command)
     await run_adb_command("adb shell input keycombination 113 29 && adb shell input keyevent 67")
-    await run_adb_command(f'adb shell input text "{text}"')
+    # Replace spaces with "\ " to properly handle them in ADB shell input
+    formatted_text = text.replace(" ", "\\ ")
+    # Send the formatted text to the device
+    await run_adb_command(f'adb shell input text "{formatted_text}"')
+
 
 async def click_send_button():
     """Clicks the send button."""
-    await run_adb_command("adb shell input tap 1009 1353")
-
-async def press_back_button():
-    """Presses the back button."""
-    await run_adb_command("adb shell input keyevent 4")
+    await run_adb_command("adb shell input tap 1009 2136")
 
 async def send_messenger_message(message, executed):
     try:

