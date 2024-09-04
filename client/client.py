@@ -18,7 +18,12 @@ async def connect_to_server(device_id, port_collector, tcpdump_manager):
         port_collector.start()
         tcpdump_manager.run_tcpdump()
         
-        uri = f"ws://<server-ip>:5000?device_id={device_id}"
+        server_ip = ""
+        port = 5000
+        device_id = "{device_id}"
+
+        # Constructing the URI
+        uri = f"ws://[{server_ip}]:{port}?device_id={device_id}"
         async with websockets.connect(uri) as websocket:
             await websocket.send(json.dumps({"event": "ready", "data": {"status": "ready"}}))
 
