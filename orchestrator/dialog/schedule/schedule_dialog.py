@@ -35,6 +35,9 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    df = assign_random_values(args.input_file)
-    export_to_excel(df, args.output_file)
+    input_file = "in/" + args.input_file
+    output_file = "out/" + args.output_file
+
+    df = assign_random_values(input_file)
+    export_to_excel(df, output_file)
     print(f"Data has been exported to {args.output_file}")
