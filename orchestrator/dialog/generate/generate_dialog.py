@@ -78,9 +78,11 @@ def main():
 
     input_file = "in/" + args.input_file
     output_file = "out/" + args.output_file
+    output_file_in_schedule = "../schedule/in/" + args.output_file
 
     dialogue_data = parse_dialogue(input_file)
     save_to_excel(dialogue_data, output_file)
+    save_to_excel(dialogue_data, output_file_in_schedule)
 
 if __name__ == "__main__":
     main()

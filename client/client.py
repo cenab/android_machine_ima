@@ -2,99 +2,98 @@ import asyncio
 import websockets
 import json
 import uuid
-import subprocess
-import json as JSON
-from client.commands.discord import send_discord_message
-from client.commands.messenger import send_messenger_message
-from client.commands.signal import send_signal_message
-from client.commands.skype import send_skype_message
-from client.commands.slack import send_slack_message
-from client.commands.teams import send_teams_message
-from client.commands.telegram import send_telegram_message
-from client.commands.whatsapp import send_whatsapp_message
+from client.commands import (send_discord_message, send_messenger_message, send_signal_message,
+                             send_skype_message, send_slack_message, send_teams_message,
+                             send_telegram_message, send_whatsapp_message)
 from client.collectors.tcp.tcp_dump_manager import TcpDumpManager
 from client.collectors.ports.network_stats_collector import NetworkStatsCollector
 
 EXECUTED_LIST = {
-    'discord': False,
-    'messenger': False,
-    'signal': False,
-    'skype': False,
-    'slack': False,
-    'teams': False,
-    'telegram': False,
-    'whatsapp': False}
+    'discord': False, 'messenger': False, 'signal': False, 'skype': False,
+    'slack': False, 'teams': False, 'telegram': False, 'whatsapp': False
+}
 
 async def connect_to_server(device_id, port_collector, tcpdump_manager):
     try:
-        # Start the collectors
         port_collector.start()
         tcpdump_manager.run_tcpdump()
         
         uri = f"ws://<server-ip>:5000?device_id={device_id}"
         async with websockets.connect(uri) as websocket:
-            await websocket.send(json.dumps({"status": "ready"}))
+            await websocket.send(json.dumps({"event": "ready", "data": {"status": "ready"}}))
 
             while True:
                 message = await websocket.recv()
                 data = json.loads(message)
 
-                if data['type'] == 'execute_command':
-                    command_id = data['command_id']
-                    command = data['command']
+                if data.get('event') == 'execute_command':
+                    command_data = data['data']
+                    command_id = command_data['command_id']
+                    command = command_data['command']
                     result = await execute_command(command)
+
                     await websocket.send(json.dumps({
-                        "device_id": device_id,
-                        "command_id": command_id,
-                        "result": result
+                        "event": "command_result",
+                        "data": {
+                            "device_id": device_id,
+                            "command_id": command_id,
+                            "result": result
+                        }
                     }))
+
+                    # Wait for the specified time before processing the next command
+                    wait_time = command.get('wait_time', 5)
+                    await asyncio.sleep(wait_time)
+
     except websockets.exceptions.ConnectionClosed:
         print("WebSocket connection closed, stopping collectors.")
     except Exception as e:
         print(f"An error occurred: {str(e)}")
     finally:
-        # Ensure collectors are stopped when connection closes or an error occurs
         stop_collectors(port_collector, tcpdump_manager)
 
 async def execute_command(command):
-    """
-    Execute a shell command and return the result.
-    """
     try:
-        # Ensure the command is safe to execute
-        command = JSON.dumps(command)
-        result = post_message_to_the_chat(command.get('message'), command.get('platform'), executed=True)
-        return {"status": "success", "output": result.stdout}
-    except subprocess.CalledProcessError as e:
-        return {"status": "failure", "error": str(e), "output": e.stderr}
+        platform = command.get('platform')
+        character = command.get('character', '')
+        dialogue = command.get('dialogue', '')
+        number = command.get('number', 1)
+
+        if platform and dialogue:
+            message = f"{character}: {dialogue}"
+            if number > 1:
+                message += f" (x{number})"
+            result = post_message_to_the_chat(message, platform)
+            return {"status": "success", "output": result.stdout if result else ""}
+        else:
+            return {"status": "failure", "error": "Invalid command structure"}
+    except Exception as e:
+        return {"status": "failure", "error": str(e)}
 
 def post_message_to_the_chat(message, platform):
-    """ Sends a message to the specified platform's chat. """
     executed = EXECUTED_LIST[platform]
-    if platform == 'discord':
-        return send_discord_message(message, executed)
-    elif platform == 'messenger':
-        return send_messenger_message(message, executed)
-    elif platform == 'signal':
-        return send_signal_message(message, executed)
-    elif platform == 'skype':
-        return send_skype_message(message, executed)
-    elif platform == 'slack':
-        return send_slack_message(message, executed)
-    elif platform == 'teams':
-        return send_teams_message(message, executed)
-    elif platform == 'telegram':
-        return send_telegram_message(message, executed)
-    elif platform == 'whatsapp':
-        return send_whatsapp_message(message, executed)
+    platform_functions = {
+        'discord': send_discord_message,
+        'messenger': send_messenger_message,
+        'signal': send_signal_message,
+        'skype': send_skype_message,
+        'slack': send_slack_message,
+        'teams': send_teams_message,
+        'telegram': send_telegram_message,
+        'whatsapp': send_whatsapp_message
+    }
+    
+    if platform in platform_functions:
+        result = platform_functions[platform](message, executed)
+        EXECUTED_LIST[platform] = True
+        return result
     else:
         print("Unsupported platform")
-    EXECUTED_LIST[platform] = True
+        return None
 
 def stop_collectors(port_collector, tcpdump_manager):
-    """ Stop the network statistics collector and tcpdump manager. """
-    port_collector.stop()  # Stops the NetworkStatsCollector
-    tcpdump_manager.stop_tcpdump()  # Stops the TcpDumpManager
+    port_collector.stop()
+    tcpdump_manager.stop_tcpdump()
 
 if __name__ == "__main__":
     print("Starting client")
