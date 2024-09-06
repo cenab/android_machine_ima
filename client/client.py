@@ -2,11 +2,16 @@ import asyncio
 import websockets
 import json
 import uuid
-from client.commands import (send_discord_message, send_messenger_message, send_signal_message,
-                             send_skype_message, send_slack_message, send_teams_message,
-                             send_telegram_message, send_whatsapp_message)
-from client.collectors.tcp.tcp_dump_manager import TcpDumpManager
-from client.collectors.ports.network_stats_collector import NetworkStatsCollector
+from .commands.discord import send_discord_message
+from .commands.messenger import send_messenger_message
+from .commands.signal import send_signal_message
+from .commands.skype import send_skype_message
+from .commands.slack import send_slack_message
+from .commands.teams import send_teams_message
+from .commands.telegram import send_telegram_message
+from .commands.whatsapp import send_whatsapp_message
+from .collectors.tcp.tcp_dump_manager import TcpDumpManager
+from .collectors.ports.network_stats_collector import NetworkStatsCollector
 
 EXECUTED_LIST = {
     'discord': False, 'messenger': False, 'signal': False, 'skype': False,
