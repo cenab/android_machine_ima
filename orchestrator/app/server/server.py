@@ -27,8 +27,8 @@ def hello():
     return "Hello, World!"
 
 @socketio.on('connect')
-def handle_connect():
-    global orchestrator_connected, orchestrator
+def handle_connect(auth):
+    global orchestrator_connected, orchestrator, device_connection_order
     device_id = request.args.get('device_id')
     if device_id == "orchestrator" and not orchestrator_connected:
         orchestrator_connected = True
