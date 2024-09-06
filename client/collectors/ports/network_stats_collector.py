@@ -24,6 +24,14 @@ class NetworkStatsCollector:
         self.stop_event = Event()
         self.process = None
 
+    def ensure_output_files_exist(self):
+        """Ensure all output files exist."""
+        for output_file in self.apps.values():
+            if not os.path.exists(output_file):
+                # Create the file if it doesn't exist
+                with open(output_file, 'a') as file:
+                    pass
+
     def capture_network_stats(self):
         """Capture network statistics for defined apps."""
         timestamp = time.strftime("%Y-%m-%d %T")
@@ -34,6 +42,8 @@ class NetworkStatsCollector:
                 with open(output_file, 'a') as f:
                     for line in result.stdout.splitlines():
                         f.write(f"{timestamp} {line}\n")
+            else:
+                print(f"No network stats found for {package}")
 
     def process_address(self, address_part):
         """Process address part and extract IP and port."""
@@ -48,16 +58,17 @@ class NetworkStatsCollector:
     def process_network_stats(self):
         """Process the captured network statistics to extract unique IPs and ports."""
         for output_file in self.apps.values():
-            with open(output_file, 'r') as file:
-                for line in file:
-                    if 'tcp6' not in line and 'udp' not in line:
-                        continue
-                    parts = [part for part in line.split(' ') if part]
-                    if len(parts) >= 7:
-                        local_address_part = parts[5]
-                        remote_address_part = parts[6]
-                        self.process_address(local_address_part)
-                        self.process_address(remote_address_part)
+            if os.path.exists(output_file):
+                with open(output_file, 'r') as file:
+                    for line in file:
+                        if 'tcp6' not in line and 'udp' not in line:
+                            continue
+                        parts = [part for part in line.split(' ') if part]
+                        if len(parts) >= 7:
+                            local_address_part = parts[5]
+                            remote_address_part = parts[6]
+                            self.process_address(local_address_part)
+                            self.process_address(remote_address_part)
 
     def generate_wireshark_filter(self):
         """Generate Wireshark filter string from unique IPs and ports."""
@@ -72,6 +83,7 @@ class NetworkStatsCollector:
 
     def start_collecting(self):
         """Start the network statistics collection process."""
+        self.ensure_output_files_exist()
         while not self.stop_event.is_set():
             self.capture_network_stats()
             self.process_network_stats()
@@ -92,8 +104,10 @@ class NetworkStatsCollector:
 
     def start(self):
         """Start the background process."""
-        self.process = Process(target=self.start_collecting)
-        self.process.start()
+        if self.process is None:
+            self.stop_event.clear()
+            self.process = Process(target=self.start_collecting)
+            self.process.start()
 
     def stop(self):
         """Stop the background process."""
