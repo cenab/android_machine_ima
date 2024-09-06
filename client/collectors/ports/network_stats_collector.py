@@ -7,14 +7,11 @@ class NetworkStatsCollector:
     def __init__(self):
         self.apps = {
             "com.Slack": "Slack_output.txt",
-            "com.Discord": "Discord_output.txt",
-            "com.RocketChat": "RocketChat_output.txt",
-            "com.Microsoft.Teams": "Teams_output.txt",
-            "com.textnow": "Textnow_output.txt",
+            "com.discord": "Discord_output.txt",
+            "com.microsoft.teams": "Teams_output.txt",
             "com.facebook.orca": "Messenger_output.txt",
-            "org.telegram.messenger": "Telegram_output.txt",
+            "org.telegram.messenger.web": "Telegram_output.txt",
             "org.thoughtcrime.securesms": "Signal_output.txt",
-            "com.snapchat.android": "Snapchat_output.txt",
             "com.whatsapp": "WhatsApp_output.txt"
         }
 
