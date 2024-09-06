@@ -1,5 +1,5 @@
 import logging
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_socketio import SocketIO, emit, disconnect
 from queue import Queue
 import threading
@@ -21,6 +21,10 @@ device_connection_order_dict = {}
 
 orchestrator_connected = False
 orchestrator = None
+
+@app.route('/')
+def hello():
+    return "Hello, World!"
 
 @socketio.on('connect')
 def handle_connect():

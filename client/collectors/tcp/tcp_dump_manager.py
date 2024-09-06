@@ -1,4 +1,5 @@
 import subprocess
+import time
 
 class TcpDumpManager:
     def __init__(self):
@@ -34,15 +35,31 @@ class TcpDumpManager:
     def start_tcpdump(self):
         """Start tcpdump to capture all network traffic in the background."""
         command = "adb shell /data/local/tmp/tcpdump -i any -s 0 -w /sdcard/imas_all_tcpdump.pcap"
-        self.process = subprocess.Popen(command, shell=True)
-        print(f"Started tcpdump as a background process with PID: {self.process.pid}")
+        
+        try:
+            # Start tcpdump as a background process
+            self.process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            print(f"Started tcpdump as a background process with PID: {self.process.pid}")
+
+            # Wait for a short duration to ensure tcpdump starts properly
+            time.sleep(2)
+
+            # Check if tcpdump started successfully
+            if self.process.poll() is None:  # If the process is still running
+                print(f"tcpdump is running with PID: {self.process.pid}")
+            else:
+                stderr_output = self.process.stderr.read().decode()
+                print(f"Failed to start tcpdump. Error: {stderr_output}")
+
+        except Exception as e:
+            print(f"An error occurred while starting tcpdump: {e}")
 
     def stop_tcpdump(self):
         """Stop the tcpdump process if it's running."""
         if self.process and self.process.poll() is None:  # Check if process is still running
             self.process.terminate()
             print(f"Stopped tcpdump process with PID: {self.process.pid}")
-            self.process = None  # Reset the process attribute
+            self.process = None
         else:
             print("No tcpdump process is currently running.")
 
