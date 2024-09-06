@@ -1,33 +1,34 @@
 import asyncio
-import websockets
+import socketio
 import json
-import random
 import pandas as pd
 import argparse
 
 # Server details
-SERVER_URL = 'ws://localhost:5000'
+SERVER_URL = 'http://localhost:5000'
 
 # Device ID for the orchestrator
 device_id = 'orchestrator'
 
-async def send_command(websocket, command):
+# Create a Socket.IO client
+sio = socketio.AsyncClient()
+
+async def send_command(command):
     """Sends a command to the server."""
     message = {
-        'event': 'add_command',
-        'data': {
-            'device_id': command.get('device_id', 'some_device_id'),
-            'command': command
-        }
+        'device_id': command.get('device_id', 'some_device_id'),
+        'command': command
     }
-    await websocket.send(json.dumps(message))
-    response = await websocket.recv()
-    response_data = json.loads(response)
-    if response_data.get('event') == 'command_status' and response_data['data']['status'] == 'Command added':
-        print(f"Command sent successfully: {command}")
-        return response_data['data']['command_id']
-    else:
-        print(f"Error sending command: {response_data}")
+    try:
+        response = await sio.call('add_command', message)
+        if response.get('status') == 'Command added':
+            print(f"Command sent successfully: {command}")
+            return response.get('command_id')
+        else:
+            print(f"Error sending command: {response}")
+            return None
+    except Exception as e:
+        print(f"Error sending command: {e}")
         return None
 
 def read_xlsx_line_by_line(file_path):
@@ -37,9 +38,9 @@ def read_xlsx_line_by_line(file_path):
         yield row.to_dict()
 
 async def orchestrator_loop(file_path):
-    uri = f"{SERVER_URL}?device_id={device_id}"
-    async with websockets.connect(uri) as websocket:
-        print("Connected to server")
+    await sio.connect(f"{SERVER_URL}?device_id={device_id}")
+    print("Connected to server")
+    try:
         while True:  # Continuous operation
             for row in read_xlsx_line_by_line(file_path):
                 try:
@@ -53,7 +54,7 @@ async def orchestrator_loop(file_path):
                     }
 
                     # Send the command to the server
-                    command_id = await send_command(websocket, command)
+                    command_id = await send_command(command)
 
                     # Wait for the specified time before sending the next command
                     wait_time = command['wait_time']
@@ -63,6 +64,16 @@ async def orchestrator_loop(file_path):
                 except Exception as e:
                     print(f"Error processing row: {e}")
             print("Reached end of file. Restarting from beginning...")
+    finally:
+        await sio.disconnect()
+
+@sio.event
+async def connect():
+    print("Connected to server")
+
+@sio.event
+async def disconnect():
+    print("Disconnected from server")
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Orchestrator for distributed command execution system.")
