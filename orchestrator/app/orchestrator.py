@@ -5,7 +5,7 @@ import pandas as pd
 import argparse
 
 # Server details
-SERVER_URL = 'ws://localhost:80'
+SERVER_URL = 'ws://localhost:5000'
 
 # Device ID for the orchestrator
 device_id = 'orchestrator'
