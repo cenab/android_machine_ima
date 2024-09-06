@@ -39,7 +39,9 @@ async def fill_textbar(text):
     await run_adb_command(f'adb shell input text "{formatted_text}"')
 
 async def open_general_channel():
-    await run_adb_command("adb shell input tap 217 1255")
+    await run_adb_command("adb shell input tap 260 333")
+    await run_adb_command("adb shell input text 'general'")
+    await run_adb_command("adb shell input tap 420 335")
 
 async def send_message():
     await run_adb_command("adb shell input tap 1000 2136")

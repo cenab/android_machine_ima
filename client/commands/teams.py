@@ -25,10 +25,7 @@ async def open_teams():
     await run_adb_command("adb shell monkey -p com.microsoft.teams -c android.intent.category.LAUNCHER 1")
     await run_adb_command("adb pull $(adb shell uiautomator dump | grep -oP '[^ ]+.xml') /tmp/view.xml")
     
-    coordinates_script = (
-        "coords=$(perl -ne 'printf \"%d %d\\n\", ($1+$3)/2, ($2+$4)/2 "
-        "if /text=\"OK\"[^>]*bounds=\"\\[(\\d+),(\\d+)\\]\\[(\\d+),(\\d+)\\]\"/' /tmp/view.xml)"
-    )
+    coordinates_script =  """coords=$(perl -ne 'printf "%d %d\n", ($1+$3)/2, ($2+$4)/2 if /text="OK"[^>]*bounds="\[(\d+),(\d+)\]\[(\d+),(\d+)\]"/' /tmp/view.xml)"""
     await run_adb_command(coordinates_script)
     await run_adb_command("adb shell input tap $coords")
 
