@@ -105,7 +105,7 @@ async def main():
     tcpdump_manager.run_tcpdump()
 
     # Connect to the server via SocketIO
-    server_ip = "34.82.229.67"
+    server_ip = "34.28.12.146"
     await sio.connect(f'ws://{server_ip}:80?device_id={device_id}')
     await sio.wait()
 
