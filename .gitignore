@@ -4,3 +4,4 @@
 terraform.tfvars
 login.txt
 *.xlsx
+.history
