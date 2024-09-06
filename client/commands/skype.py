@@ -43,11 +43,8 @@ async def fill_textbar(text):
 
 async def click_send_button():
     """Clicks the send button."""
-    await run_adb_command("adb shell input tap 1000 2127")
-
-async def click_back_button():
-    """Simulates pressing Ctrl+Backspace to delete text and then the Back key."""
     await run_adb_command("adb shell input keycombination 113 29 && adb shell input keyevent 67")
+    await run_adb_command("adb shell input tap 1000 2127")
 
 async def send_skype_message(message, executed):
     try:
