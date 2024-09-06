@@ -5,7 +5,11 @@ import pandas as pd
 import argparse
 
 # Server details
+<<<<<<< Updated upstream
 SERVER_URL = 'http://localhost:5000'
+=======
+SERVER_URL = 'ws://localhost:80'
+>>>>>>> Stashed changes
 
 # Device ID for the orchestrator
 device_id = 'orchestrator'
