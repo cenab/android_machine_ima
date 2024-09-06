@@ -103,4 +103,4 @@ def send_next_command(device_id):
                 logger.info(f"Sent command {command_id} to device {device_id} using sid {sid}")
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=5000, debug=True, allow_unsafe_werkzeug=True)
+    socketio.run(app, host='0.0.0.0', port=80, debug=True, allow_unsafe_werkzeug=True)
