@@ -28,11 +28,13 @@ class TcpDumpManager:
 
     def change_tcpdump_permissions(self):
         """Change permissions of the tcpdump binary."""
-        self.run_command("adb shell chmod 6755 /system/xbin/tcpdump")
+        # Updating the path to the tcpdump binary
+        self.run_command("adb shell chmod 6755 /data/local/tmp/tcpdump")
 
     def start_tcpdump(self):
         """Start tcpdump to capture all network traffic in the background."""
-        command = "adb shell /system/xbin/tcpdump -i any -s 0 -w /sdcard/imas_all_tcpdump.pcap"
+        # Updating the path to the tcpdump binary
+        command = "adb shell /data/local/tmp/tcpdump -i any -s 0 -w /sdcard/imas_all_tcpdump.pcap"
         self.process = subprocess.Popen(command, shell=True)
         print(f"Started tcpdump as a background process with PID: {self.process.pid}")
 
