@@ -106,7 +106,7 @@ async def main():
 
     # Connect to the server via SocketIO
     server_ip = "34.28.12.146"
-    await sio.connect(f'ws://{server_ip}:80?device_id={device_id}')
+    await sio.connect(f'ws://{server_ip}:5000?device_id={device_id}')
     await sio.wait()
 
     # Stop collectors on exit
