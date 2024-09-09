@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define paths
-APP_DIR=~/android_machine_ima # Update this to the actual path of your app directory
+APP_DIR=~/android_machine_ima/orchestrator # Update this to the actual path of your app directory
 VENV_DIR="$APP_DIR/venv"
 REQUIREMENTS_FILE="$APP_DIR/requirements.txt"
 SERVER_FILE="$APP_DIR/server/server.py"
