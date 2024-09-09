@@ -1,11 +1,9 @@
 asyncio
-socketio
-json
+python-socketio
 pandas
 argparse
 Flask
 flask-socketio
-python-socketio
 eventlet
 gunicorn
 uuid; python_version < "3.8"
