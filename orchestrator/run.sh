@@ -4,8 +4,8 @@
 APP_DIR=~/android_machine_ima/orchestrator # Update this to the actual path of your app directory
 VENV_DIR="$APP_DIR/venv"
 REQUIREMENTS_FILE="$APP_DIR/requirements.txt"
-SERVER_FILE="$APP_DIR/server/server.py"
-ORCHESTRATOR_FILE="$APP_DIR/orchestrator.py"
+SERVER_FILE="$APP_DIR/app/server/server.py"
+ORCHESTRATOR_FILE="$APP_DIR/app/orchestrator.py"
 
 # Function to install system dependencies
 install_system_dependencies() {
