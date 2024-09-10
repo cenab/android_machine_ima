@@ -105,8 +105,9 @@ async def main():
     tcpdump_manager.run_tcpdump()
 
     # Connect to the server via SocketIO
+    server_ip = os.environ.get('SERVER_IP', 'default_ip_here')
     server_ip = "35.185.235.215"
-    await sio.connect(f'ws://{server_ip}:5000?device_id={device_id}')
+    await sio.connect(f'ws://{server_ip}:80?device_id={device_id}')
     await sio.wait()
 
     # Stop collectors on exit

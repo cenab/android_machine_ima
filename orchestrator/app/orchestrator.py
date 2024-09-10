@@ -6,7 +6,7 @@ import argparse
 import os
 
 # Server details
-SERVER_URL = 'ws://localhost:5000'
+SERVER_URL = 'ws://localhost:80'
 
 # Device ID for the orchestrator
 device_id = 'orchestrator'
