@@ -58,7 +58,7 @@ run_server() {
 # Function to run the orchestrator
 run_orchestrator() {
   echo "Starting the orchestrator..."
-  python "$ORCHESTRATOR_FILE" --file dialog/schedule/out/ &
+  python "$ORCHESTRATOR_FILE" &
   ORCHESTRATOR_PID=$!
   echo "Orchestrator started with PID $ORCHESTRATOR_PID"
 }
