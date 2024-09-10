@@ -17,7 +17,7 @@ device_status = {}
 device_queues = {}
 device_sockets = {}
 lock = threading.Lock()
-device_connection_order = 0
+device_connection_order = 1
 device_connection_order_dict = {}
 
 orchestrator_connected = False
@@ -41,7 +41,7 @@ def handle_connect(auth):
     else:
         device_status[device_id] = 'ready'
         device_sockets[device_id] = request.sid
-        device_connection_order += 1
+        device_connection_order++
         device_connection_order_dict[device_connection_order] = device_id
         logger.info(f"Device {device_id} connected with sid {request.sid}")
         emit('status', {'status': 'Connected to server'})

@@ -14,7 +14,7 @@ def assign_random_values(file_path):
         pandas.DataFrame: DataFrame with added 'Number', 'IMA', and 'Wait Time' columns.
     """
     df = pd.read_excel(file_path)
-    df['Number'] = [random.randint(0, 2) for _ in range(len(df))]
+    df['Number'] = [random.randint(1, 3) for _ in range(len(df))]
     df['IMA'] = [random.choice(['discord', 'messenger', 'signal', 'skype', 'slack', 'teams', 'telegram', 'whatsapp']) for _ in range(len(df))]
     df['Wait Time (seconds)'] = [random.randint(0, 60) for _ in range(len(df))]
     return df
