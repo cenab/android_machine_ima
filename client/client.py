@@ -55,11 +55,8 @@ async def execute_command_impl(command: Dict[str, Any]) -> Dict[str, Any]:
         platform = command.get('platform')
         character = command.get('character', '')
         dialogue = command.get('dialogue', '')
-        number = command.get('number', 1)
         if platform and dialogue:
             message = f"{character}: {dialogue}"
-            if number > 1:
-                message += f" (x{number})"
             result = await post_message_to_the_chat(message, platform)
             return {"status": "success", "output": result.stdout if result else ""}
         else:
