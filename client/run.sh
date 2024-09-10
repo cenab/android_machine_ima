@@ -3,6 +3,29 @@
 # Exit immediately if a command exits with a non-zero status
 set -e
 
+# Function to check if a command exists
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
+}
+
+# Function to install necessary packages
+install_packages() {
+    echo "Some necessary packages are missing. Do you want to install them? (y/n)"
+    read -r response
+    if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+        sudo apt update
+        sudo apt install -y python3-venv python3-pip
+    else
+        echo "Cannot proceed without necessary packages. Exiting."
+        exit 1
+    fi
+}
+
+# Check for necessary packages
+if ! command_exists python3 || ! command_exists pip3; then
+    install_packages
+fi
+
 # Define directories
 BASE_DIR=$(pwd)
 CLIENT_DIR="$BASE_DIR"
@@ -15,6 +38,12 @@ download_apks() {
     echo "Downloading APKs..."
     mkdir -p "$APK_DIR"
     cd "$APK_DIR"
+    
+    # Check if gdown is installed
+    if ! command_exists gdown; then
+        echo "gdown is not installed. Installing..."
+        pip3 install gdown
+    fi
     
     # List of file IDs to download
     file_ids=(
@@ -51,6 +80,10 @@ install_apks() {
 # Function to start the emulator
 start_emulator() {
     echo "Starting emulator..."
+    if [ ! -d ~/aosp ]; then
+        echo "AOSP directory not found. Please set up AOSP before starting the emulator."
+        exit 1
+    fi
     cd ~/aosp
     source build/envsetup.sh
     lunch 16
