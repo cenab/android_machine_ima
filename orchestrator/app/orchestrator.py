@@ -3,6 +3,7 @@ import socketio
 import json
 import pandas as pd
 import argparse
+import os
 
 # Server details
 SERVER_URL = 'ws://localhost:5000'
@@ -64,6 +65,8 @@ async def orchestrator_loop(file_path):
                 except Exception as e:
                     print(f"Error processing row: {e}")
             print("Reached end of file. Restarting from beginning...")
+    except asyncio.CancelledError:
+        print("Orchestrator loop was cancelled")
     finally:
         await sio.disconnect()
 
@@ -85,4 +88,9 @@ def parse_arguments():
 
 if __name__ == '__main__':
     args = parse_arguments()
-    asyncio.run(orchestrator_loop(args.file))
+    try:
+        asyncio.run(orchestrator_loop(args.file))
+    except KeyboardInterrupt:
+        print("Orchestrator stopped by user")
+    except Exception as e:
+        print(f"An error occurred: {e}")
