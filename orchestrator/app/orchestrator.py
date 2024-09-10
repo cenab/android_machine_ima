@@ -79,15 +79,22 @@ async def disconnect():
     print("Disconnected from server")
 
 def parse_arguments():
+    # Get the directory of the current script
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    
+    # Construct the default path relative to the script location
+    default_file_path = os.path.join(script_dir, "dialog", "schedule", "out", "play_dialogue_hamlet_scheduled.xlsx")
+    
     parser = argparse.ArgumentParser(description="Orchestrator for distributed command execution system.")
     parser.add_argument('--file', 
                     type=str, 
-                    default=os.path.join("..", "dialog", "schedule", "out", "play_dialogue_hamlet_scheduled.xlsx"),
+                    default=default_file_path,
                     help="Path to the Excel file containing commands. (default: %(default)s)")
     return parser.parse_args()
 
 if __name__ == '__main__':
     args = parse_arguments()
+    
     try:
         asyncio.run(orchestrator_loop(args.file))
     except KeyboardInterrupt:

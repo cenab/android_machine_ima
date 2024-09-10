@@ -46,7 +46,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     input_file = args.file if args.file else os.path.join("in", args.input_file)
-    output_file = os.path.join("out", args.output_file)
+    output_file = os.path.join("schedule", "out", args.output_file)
 
     df = assign_random_values(input_file)
     export_to_excel(df, output_file)
