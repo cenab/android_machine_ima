@@ -21,15 +21,22 @@ async def send_command(command):
         'command': command
     }
     try:
-        response = await sio.call('add_command', message)
+        response = await sio.call('add_command', message, timeout=5)
+        if response is None:
+            print(f"Error: Server returned None response for command: {command}")
+            return None
         if response.get('status') == 'Command added':
             print(f"Command sent successfully: {command}")
             return response.get('command_id')
         else:
-            print(f"Error sending command: {response}")
+            print(f"Error: Unexpected server response: {response}")
             return None
+    except socketio.exceptions.TimeoutError:
+        print(f"Error: Server timeout while sending command: {command}")
+        return None
     except Exception as e:
         print(f"Error sending command: {e}")
+        print(f"Command details: {command}")
         return None
 
 def read_xlsx_line_by_line(file_path):
