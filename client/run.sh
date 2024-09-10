@@ -228,7 +228,7 @@ run_command adb devices
 # Run the client package
 echo "Running client package..."
 cd "$BASE_DIR/.."
-python3 -m client.client  # This command's output is not suppressed
+SERVER_IP="35.185.235.215" python3 -m client.client
 
 # Cleanup
 deactivate
