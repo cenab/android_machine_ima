@@ -3,9 +3,9 @@
 # Exit immediately if a command exits with a non-zero status
 set -e
 
-# Function to check if a command exists
-command_exists() {
-    command -v "$1" >/dev/null 2>&1
+# Function to check if a package is installed
+package_installed() {
+    dpkg -s "$1" >/dev/null 2>&1
 }
 
 # Function to install necessary packages
@@ -22,7 +22,7 @@ install_packages() {
 }
 
 # Check for necessary packages
-if ! command_exists python3 || ! command_exists pip3; then
+if ! package_installed python3-venv || ! package_installed python3-pip; then
     install_packages
 fi
 
@@ -40,7 +40,7 @@ download_apks() {
     cd "$APK_DIR"
     
     # Check if gdown is installed
-    if ! command_exists gdown; then
+    if ! pip3 list | grep -q gdown; then
         echo "gdown is not installed. Installing..."
         pip3 install gdown
     fi
