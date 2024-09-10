@@ -72,8 +72,12 @@ def save_to_excel(data, output_path):
 
 def main():
     parser = argparse.ArgumentParser(description="Convert Hamlet dialogue text to Excel.")
-    parser.add_argument("input_file", help="Path to the input text file (e.g., in/hamlet_dialogue.txt)")
-    parser.add_argument("output_file", help="Path to the output Excel file (e.g., out/play_dialogue_hamlet.xlsx)")
+    parser.add_argument("-i", "--input_file", 
+                    default="hamlet_dialogue.txt",
+                    help="Path to the input text file (default: hamlet_dialogue.txt)")
+    parser.add_argument("-o", "--output_file", 
+                        default="play_dialogue_hamlet.xlsx",
+                        help="Path to the output Excel file (default: play_dialogue_hamlet.xlsx)")
     args = parser.parse_args()
 
     input_file = "in/" + args.input_file

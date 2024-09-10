@@ -77,7 +77,10 @@ async def disconnect():
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Orchestrator for distributed command execution system.")
-    parser.add_argument('--file', type=str, required=True, help="Path to the Excel file containing commands.")
+    parser.add_argument('--file', 
+                    type=str, 
+                    default=os.path.join("..", "dialog", "schedule", "out", "play_dialogue_hamlet_scheduled.xlsx"),
+                    help="Path to the Excel file containing commands. (default: %(default)s)")
     return parser.parse_args()
 
 if __name__ == '__main__':
