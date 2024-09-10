@@ -83,7 +83,7 @@ def parse_arguments():
     script_dir = os.path.dirname(os.path.abspath(__file__))
     
     # Construct the default path relative to the script location
-    default_file_path = os.path.join(script_dir, "dialog", "schedule", "out", "play_dialogue_hamlet_scheduled.xlsx")
+    default_file_path = os.path.join(script_dir, "..", "dialog", "schedule", "out", "play_dialogue_hamlet_scheduled.xlsx")
     
     parser = argparse.ArgumentParser(description="Orchestrator for distributed command execution system.")
     parser.add_argument('--file', 
