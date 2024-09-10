@@ -4,11 +4,11 @@
 set -e
 
 # Define directories
-BASE_DIR=~/Desktop/files/android_machine_ima
-CLIENT_DIR="$BASE_DIR/client"
+BASE_DIR=$(pwd)
+CLIENT_DIR="$BASE_DIR"
 VENV_DIR="$CLIENT_DIR/venv"
 REQUIREMENTS_FILE="$CLIENT_DIR/requirements.txt"
-APK_DIR="$BASE_DIR/ima/apks"
+APK_DIR="$BASE_DIR/../ima/apks"
 
 # Function to download APKs
 download_apks() {
@@ -101,7 +101,7 @@ done
 
 # Run the client package
 echo "Running client package..."
-cd "$BASE_DIR"
+cd "$BASE_DIR/.."
 python3 -m client.client
 
 # Deactivate virtual environment
