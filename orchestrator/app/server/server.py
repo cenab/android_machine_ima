@@ -43,6 +43,7 @@ def handle_connect(auth):
         device_sockets[device_id] = request.sid
         device_connection_order += 1
         device_connection_order_dict[device_connection_order] = device_id
+        print(device_connection_order_dict)
         logger.info(f"Device {device_id} connected with sid {request.sid}")
         emit('status', {'status': 'Connected to server'})
 
