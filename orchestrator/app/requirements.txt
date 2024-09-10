@@ -1,9 +1,9 @@
 asyncio
-python-socketio
+python-socketio[client]
+aiohttp
 pandas
-argparse
+openpyxl
 Flask
 flask-socketio
 eventlet
 gunicorn
-uuid; python_version < "3.8"
