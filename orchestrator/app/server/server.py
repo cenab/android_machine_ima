@@ -39,11 +39,10 @@ def handle_connect(auth):
     elif device_id == "orchestrator" and orchestrator_connected:
         disconnect()
     else:
-        with lock:
-            device_status[device_id] = 'ready'
-            device_sockets[device_id] = request.sid
-            device_connection_order += 1
-            device_connection_order_dict[device_connection_order] = device_id
+        device_status[device_id] = 'ready'
+        device_sockets[device_id] = request.sid
+        device_connection_order += 1
+        device_connection_order_dict[device_connection_order] = device_id
         logger.info(f"Device {device_id} connected with sid {request.sid}")
         emit('status', {'status': 'Connected to server'})
 
