@@ -1,4 +1,3 @@
-python-socketio
-aiohttp # Required for python-socketio's async mode
-uuid
+python-socketio==5.7.2
+aiohttp==3.8.4  # Required for python-socketio's async mode
 typing-extensions; python_version < "3.8"
