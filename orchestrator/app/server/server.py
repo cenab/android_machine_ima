@@ -17,7 +17,7 @@ device_status = {}
 device_queues = {}
 device_sockets = {}
 lock = threading.Lock()
-device_connection_order = 1
+device_connection_order = 0
 device_connection_order_dict = {}
 
 orchestrator_connected = False
