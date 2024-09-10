@@ -86,9 +86,11 @@ start_emulator() {
     fi
     cd ~/aosp
     source build/envsetup.sh
-    lunch 16
-    launch_cvd -daemon
+    lunch 19
+    launch_cvd --x_res=1080 --y_res=2340 --dpi=443 --cpus=2 --memory_mb=10240 --num_instances=1 --daemon
+    adb devices
     adb wait-for-device
+    adb devices
     adb shell pm disable-user --user 0 com.android.inputmethod.latin
     cd - > /dev/null
 }
@@ -110,27 +112,30 @@ else
     echo "Warning: requirements.txt not found at $REQUIREMENTS_FILE"
 fi
 
-# Parse command line arguments
-while [[ $# -gt 0 ]]; do
-    case $1 in
-        --download-apks)
-            download_apks
-            shift
-            ;;
-        --install-apks)
-            install_apks
-            shift
-            ;;
-        --start-emulator)
-            start_emulator
-            shift
-            ;;
-        *)
-            echo "Unknown option: $1"
-            exit 1
-            ;;
-    esac
-done
+if [ $# -eq 0 ]; then
+    echo "No options provided. Continuing with default behavior."
+else
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            --download-apks)
+                download_apks
+                shift
+                ;;
+            --install-apks)
+                install_apks
+                shift
+                ;;
+            --start-emulator)
+                start_emulator
+                shift
+                ;;
+            *)
+                echo "Unknown option: $1"
+                exit 1
+                ;;
+        esac
+    done
+fi
 
 # Run the client package
 echo "Running client package..."
