@@ -30,8 +30,14 @@ def export_to_excel(df, output_file_path):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Process Excel files and assign random values.')
-    parser.add_argument('input_file', type=str, help='Path to the input Excel file')
-    parser.add_argument('output_file', type=str, help='Path to the output Excel file')
+    parser.add_argument('-i', '--input_file', 
+                        type=str, 
+                        default='play_dialogue_hamlet.xlsx',
+                        help='Path to the input Excel file (default: input.xlsx)')
+    parser.add_argument('-o', '--output_file', 
+                        type=str, 
+                        default='play_dialogue_hamlet_scheduled.xlsx',
+                        help='Path to the output Excel file (default: output.xlsx)')
 
     args = parser.parse_args()
 
