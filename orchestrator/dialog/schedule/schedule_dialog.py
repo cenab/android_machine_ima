@@ -1,6 +1,7 @@
 import pandas as pd
 import random
 import argparse
+import os
 
 def assign_random_values(file_path):
     """
@@ -26,6 +27,8 @@ def export_to_excel(df, output_file_path):
         df (pandas.DataFrame): The DataFrame to export.
         output_file_path (str): The path where the Excel file will be saved.
     """
+    # Ensure the output directory exists
+    os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
     df.to_excel(output_file_path, index=False)
 
 if __name__ == "__main__":
@@ -33,17 +36,18 @@ if __name__ == "__main__":
     parser.add_argument('-i', '--input_file', 
                         type=str, 
                         default='play_dialogue_hamlet.xlsx',
-                        help='Path to the input Excel file (default: input.xlsx)')
+                        help='Path to the input Excel file (default: play_dialogue_hamlet.xlsx)')
     parser.add_argument('-o', '--output_file', 
                         type=str, 
                         default='play_dialogue_hamlet_scheduled.xlsx',
-                        help='Path to the output Excel file (default: output.xlsx)')
+                        help='Path to the output Excel file (default: play_dialogue_hamlet_scheduled.xlsx)')
+    parser.add_argument('--file', type=str, help='Path to the input Excel file (alternative to -i)')
 
     args = parser.parse_args()
 
-    input_file = "in/" + args.input_file
-    output_file = "out/" + args.output_file
+    input_file = args.file if args.file else os.path.join("in", args.input_file)
+    output_file = os.path.join("out", args.output_file)
 
     df = assign_random_values(input_file)
     export_to_excel(df, output_file)
-    print(f"Data has been exported to {args.output_file}")
+    print(f"Data has been exported to {output_file}")

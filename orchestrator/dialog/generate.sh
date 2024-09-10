@@ -4,30 +4,30 @@
 set -e
 
 # Define paths
-PROJECT_ROOT=$(pwd)
-VENV_DIR="$PROJECT_ROOT/venv"
-GENERATE_SCRIPT="$PROJECT_ROOT/generate/generate_dialog.py"
-SCHEDULE_SCRIPT="$PROJECT_ROOT/schedule/schedule_dialog.py"
-INPUT_FILE="$PROJECT_ROOT/generate/in/example_hamlet.txt"
-INTERMEDIATE_OUTPUT="$PROJECT_ROOT/generate/out/play_dialogue_hamlet.xlsx"
-FINAL_OUTPUT="$PROJECT_ROOT/schedule/out/play_dialogue_hamlet_scheduled.xlsx"
+DIALOG_DIR=$(pwd)
+PROJECT_ROOT=$(dirname "$DIALOG_DIR")
+GENERATE_SCRIPT="$DIALOG_DIR/generate/generate_dialog.py"
+SCHEDULE_SCRIPT="$DIALOG_DIR/schedule/schedule_dialog.py"
+INPUT_FILE="$DIALOG_DIR/generate/in/example_hamlet.txt"
+INTERMEDIATE_OUTPUT="$DIALOG_DIR/generate/out/play_dialogue_hamlet.xlsx"
+FINAL_OUTPUT="$DIALOG_DIR/schedule/out/play_dialogue_hamlet_scheduled.xlsx"
 
-# Create and activate virtual environment
-python3 -m venv "$VENV_DIR"
-source "$VENV_DIR/bin/activate"
+# Create necessary directories
+mkdir -p "$DIALOG_DIR/generate/out"
+mkdir -p "$DIALOG_DIR/schedule/in"
+mkdir -p "$DIALOG_DIR/schedule/out"
 
-# Install requirements
-pip install -r "$PROJECT_ROOT/requirements.txt"
+# Upgrade pip and install requirements
+echo "Upgrading pip and installing requirements..."
+pip install --upgrade pip
+pip install -r "$DIALOG_DIR/requirements.txt"
 
 # Run generate_dialog.py
 echo "Running generate_dialog.py..."
-python "$GENERATE_SCRIPT" "$INPUT_FILE" "$INTERMEDIATE_OUTPUT"
+python3 "$GENERATE_SCRIPT" -i "$INPUT_FILE" -o "$INTERMEDIATE_OUTPUT"
 
 # Run schedule_dialog.py
 echo "Running schedule_dialog.py..."
-python "$SCHEDULE_SCRIPT" --file "$INTERMEDIATE_OUTPUT"
+python3 "$SCHEDULE_SCRIPT" --file "$INTERMEDIATE_OUTPUT" -o "$(basename "$FINAL_OUTPUT")"
 
 echo "Process completed. Final output: $FINAL_OUTPUT"
-
-# Deactivate virtual environment
-deactivate
