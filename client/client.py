@@ -39,14 +39,11 @@ async def execute_command(data: Dict[str, Any]):
         command_id = command_data['command_id']
         command = command_data['command']
         result = await execute_command_impl(command)
-        await sio.emit('command_result', json.dumps({
-            "event": "command_result",
-            "data": {
-                "device_id": device_id,
-                "command_id": command_id,
-                "result": result
-            }
-        }))
+        await sio.emit('command_result', {
+            "device_id": device_id,
+            "command_id": command_id,
+            "result": result
+        })
         # Wait for the specified time before processing the next command
         wait_time = command.get('wait_time', 5)
         await asyncio.sleep(wait_time)

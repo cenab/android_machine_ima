@@ -81,13 +81,29 @@ def handle_add_command(data):
 
 @socketio.on('command_result')
 def handle_command_result(data):
-    device_id = data['device_id']
-    command_id = data['command_id']
-    result = data['result']
-    with lock:
-        device_status[device_id] = 'ready'
-    logger.info(f"Command {command_id} result from {device_id}: {result}")
-    send_next_command(device_id)
+    try:
+        # If data is a string, try to parse it as JSON
+        if isinstance(data, str):
+            data = json.loads(data)
+        
+        # Check if the data is wrapped in an 'event' and 'data' structure
+        if 'event' in data and data['event'] == 'command_result' and 'data' in data:
+            data = data['data']
+        
+        device_id = data['device_id']
+        command_id = data['command_id']
+        result = data['result']
+        
+        with lock:
+            device_status[device_id] = 'ready'
+        logger.info(f"Command {command_id} result from {device_id}: {result}")
+        send_next_command(device_id)
+    except json.JSONDecodeError:
+        logger.error(f"Error decoding JSON data: {data}")
+    except KeyError as e:
+        logger.error(f"Missing key in data: {e}")
+    except Exception as e:
+        logger.error(f"Error handling command result: {str(e)}")
 
 def send_next_command(device_id):
     with lock:
