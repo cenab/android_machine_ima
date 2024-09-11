@@ -26,7 +26,7 @@ async def launch_app():
 
 async def click_on_first_messager():
     """Simulates a tap on the screen at the specified coordinates."""
-    await run_adb_command("adb shell input tap 428 358")
+    await run_adb_command("adb shell input tap 475 2142")
 
 async def fill_textbar(text):
     """Fills the text bar with the specified text."""
@@ -41,9 +41,8 @@ async def send_message():
     """Simulates a tap on the send button coordinates."""
     await run_adb_command("adb shell input tap 987 2124")
 
-async def send_whatsapp_message(message, executed):
+async def send_rocketchat_message(message, executed):
     await launch_app()
-    if not executed:
-        await click_on_first_messager()
+    await click_on_first_messager()
     await fill_textbar(message)
     await send_message()
