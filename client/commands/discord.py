@@ -22,7 +22,7 @@ async def run_adb_command(command):
 async def launch_app():
     """ Launches the Discord app. """
     await run_adb_command("adb shell input keyevent KEYCODE_HOME")
-    await run_adb_command("adb shell monkey -p com.discord -c android.intent.category.LAUNCHER 1")
+    await run_adb_command("adb shell am start -n com.discord/.main.MainActivity")
 
 async def tap_textbar():
     """Taps the text bar for input."""
