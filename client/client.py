@@ -17,8 +17,14 @@ from .collectors.tcp.tcp_dump_manager import TcpDumpManager
 from .collectors.ports.network_stats_collector import NetworkStatsCollector
 
 EXECUTED_LIST: Dict[str, bool] = {
-    'discord': False, 'messenger': False, 'signal': False, 'skype': False,
-    'slack': False, 'teams': False, 'telegram': False, 'whatsapp': False
+    'discord': True,
+    'messenger': True,
+    'signal': True,
+    'skype': True,
+    'slack': True,
+    'teams': True,
+    'telegram': True,
+    'whatsapp': True
 }
 
 sio = socketio.AsyncClient()
