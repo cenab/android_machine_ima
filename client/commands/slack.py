@@ -21,7 +21,7 @@ async def run_adb_command(command):
 
 async def start_messenger():
     await run_adb_command("adb shell input keyevent KEYCODE_HOME")
-    await run_adb_command("adb shell monkey -p com.Slack -c android.intent.category.LAUNCHER 1")
+    await run_adb_command("adb shell am start -n com.Slack/.launch.StartActivity")
 
 async def tap_first_groupchat():
     await run_adb_command("adb shell input tap 125 800")
