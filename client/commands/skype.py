@@ -22,11 +22,11 @@ async def run_adb_command(command):
 async def open_skype():
     """Launches the Skype app."""
     await run_adb_command("adb shell input keyevent KEYCODE_HOME")
-    await run_adb_command("adb shell am start -n com.skype.raider/.Main --activity-brought-to-front")
+    await run_adb_command("adb shell am start -n com.skype.raider/com.skype4life.MainActivity --activity-brought-to-front")
 
 async def click_second_conversation():
     """Clicks on the second conversation."""
-    await run_adb_command("adb shell input tap 480 1141")
+    await run_adb_command("adb shell input tap 480 1353")
 
 async def click_textbox():
     """Clicks on the text box for input."""
@@ -43,7 +43,6 @@ async def fill_textbar(text):
 
 async def click_send_button():
     """Clicks the send button."""
-    await run_adb_command("adb shell input keycombination 113 29 && adb shell input keyevent 67")
     await run_adb_command("adb shell input tap 1000 2127")
 
 async def send_skype_message(message, executed):

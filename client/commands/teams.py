@@ -22,7 +22,7 @@ async def run_adb_command(command):
 async def open_teams():
     """Launches the Teams app and handles the 'OK' button click if necessary."""
     await run_adb_command("adb shell input keyevent KEYCODE_HOME")
-    await run_adb_command("adb shell am start -n com.microsoft.teams/com.microsoft.teams.splash.SplashActivity --activity-brought-to-front")
+    await run_adb_command("adb shell am start -n com.microsoft.teams/com.microsoft.skype.teams.Launcher --activity-brought-to-front")
     await run_adb_command("adb pull $(adb shell uiautomator dump | grep -oP '[^ ]+.xml') /tmp/view.xml")
     
     coordinates_script =  """coords=$(perl -ne 'printf "%d %d\n", ($1+$3)/2, ($2+$4)/2 if /text="OK"[^>]*bounds="\[(\d+),(\d+)\]\[(\d+),(\d+)\]"/' /tmp/view.xml)"""
