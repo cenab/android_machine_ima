@@ -21,6 +21,7 @@ class NetworkStatsCollector:
         self.excluded_ports = {'443'}
         self.stop_event = Event()
         self.process = None
+        self.consolidated_output = "consolidated_network_stats.txt"
 
     def ensure_output_files_exist(self):
         """Ensure all output files exist."""
@@ -33,15 +34,18 @@ class NetworkStatsCollector:
     def capture_network_stats(self):
         """Capture network statistics for defined apps."""
         timestamp = time.strftime("%Y-%m-%d %T")
-        for package, output_file in self.apps.items():
-            command = f'adb shell netstat -p -n | grep "{package}"'
-            result = subprocess.run(command, shell=True, capture_output=True, text=True)
-            if result.stdout:
-                with open(output_file, 'a') as f:
-                    for line in result.stdout.splitlines():
-                        f.write(f"{timestamp} {line}\n")
-            else:
-                print(f"No network stats found for {package}")
+        with open(self.consolidated_output, 'a') as consolidated_file:
+            for package, output_file in self.apps.items():
+                command = f'adb shell netstat -p -n | grep "{package}"'
+                result = subprocess.run(command, shell=True, capture_output=True, text=True)
+                if result.stdout:
+                    with open(output_file, 'a') as f:
+                        for line in result.stdout.splitlines():
+                            output_line = f"{timestamp} {line}\n"
+                            f.write(output_line)
+                            consolidated_file.write(f"{package}: {output_line}")
+                else:
+                    print(f"No network stats found for {package}")
 
     def process_address(self, address_part):
         """Process address part and extract IP and port."""
