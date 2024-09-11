@@ -22,7 +22,7 @@ async def run_adb_command(command):
 async def start_messenger():
     """Launches the Messenger app."""
     await run_adb_command("adb shell input keyevent KEYCODE_HOME")
-    await run_adb_command("adb shell am start -n com.facebook.orca/.auth.StartScreenActivity")
+    await run_adb_command("adb shell am start -n com.facebook.orca/.auth.StartScreenActivity --activity-brought-to-front")
 
 async def stop_messenger():
     """Stops the Messenger app."""

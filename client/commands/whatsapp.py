@@ -22,7 +22,7 @@ async def run_adb_command(command):
 async def launch_app():
     """Launches an app using its package name."""
     await run_adb_command("adb shell input keyevent KEYCODE_HOME")
-    await run_adb_command("adb shell am start -n com.whatsapp/.Main")
+    await run_adb_command("adb shell am start -n com.whatsapp/.Main --activity-brought-to-front")
 
 async def click_on_first_messager():
     """Simulates a tap on the screen at the specified coordinates."""
