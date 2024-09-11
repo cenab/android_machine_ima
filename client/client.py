@@ -12,7 +12,7 @@ from .commands.skype import send_skype_message
 from .commands.slack import send_slack_message
 from .commands.teams import send_teams_message
 from .commands.telegram import send_telegram_message
-from .commands.whatsapp import send_whatsapp_message
+from .commands.rocket import send_rocketchat_message
 from .collectors.tcp.tcp_dump_manager import TcpDumpManager
 from .collectors.ports.network_stats_collector import NetworkStatsCollector
 
@@ -24,7 +24,7 @@ EXECUTED_LIST: Dict[str, bool] = {
     'slack': True,
     'teams': True,
     'telegram': True,
-    'whatsapp': True
+    'rocketchat': True
 }
 
 sio = socketio.AsyncClient()
@@ -80,7 +80,7 @@ async def post_message_to_the_chat(message: str, platform: str):
         'slack': send_slack_message,
         'teams': send_teams_message,
         'telegram': send_telegram_message,
-        'whatsapp': send_whatsapp_message
+        'rocket': send_rocketchat_message
     }
     if platform in platform_functions:
         result = await platform_functions[platform](message, executed)
