@@ -12,8 +12,8 @@ class NetworkStatsCollector:
             "com.facebook.orca": "Messenger_output.txt",
             "org.telegram.messenger.web": "Telegram_output.txt",
             "org.thoughtcrime.securesms": "Signal_output.txt",
-            "com.whatsapp": "WhatsApp_output.txt",
-            "com.skype.raider": "Skype_output.txt"
+            "com.skype.raider": "Skype_output.txt",
+            "chat.rocket.android": "RocketChat_output.txt"
         }
 
         self.unique_ports = set()

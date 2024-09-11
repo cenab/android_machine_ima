@@ -22,7 +22,7 @@ async def run_adb_command(command):
 async def open_skype():
     """Launches the Skype app."""
     await run_adb_command("adb shell input keyevent KEYCODE_HOME")
-    await run_adb_command("adb shell am start -n com.skype.raider/.Main")
+    await run_adb_command("adb shell am start -n com.skype.raider/.Main --activity-brought-to-front")
 
 async def click_second_conversation():
     """Clicks on the second conversation."""

@@ -22,7 +22,7 @@ async def run_adb_command(command):
 async def launch_app():
     """Launches an app using its package name."""
     await run_adb_command("adb shell input keyevent KEYCODE_HOME")
-    await run_adb_command("adb shell am start -n org.telegram.messenger.web/org.telegram.ui.LaunchActivity --activity-brought-to-front")
+    await run_adb_command("adb shell am start -n chat.rocket.android/chat.rocket.reactnative.MainActivity --activity-brought-to-front")
 
 async def click_on_first_messager():
     """Simulates a tap on the screen at the specified coordinates."""
@@ -41,7 +41,7 @@ async def send_message():
     """Simulates a tap on the send button coordinates."""
     await run_adb_command("adb shell input tap 987 2124")
 
-async def send_telegram_message(message, executed):
+async def send_whatsapp_message(message, executed):
     await launch_app()
     if not executed:
         await click_on_first_messager()
