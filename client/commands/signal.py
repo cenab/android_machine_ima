@@ -18,7 +18,7 @@ async def run_adb_command(command):
     else:
         logging.error(f"Command failed: {stderr.decode().strip()}")
 
-    await asyncio.sleep(0.5)  # Small delay to ensure the command has time to execute
+    await asyncio.sleep(1)  # Small delay to ensure the command has time to execute
 
 async def launch_app():
     """Launches an app using its package name."""
@@ -27,7 +27,7 @@ async def launch_app():
 
 async def click_on_first_messager():
     """Simulates a tap on the screen at the specified coordinates."""
-    await run_adb_command("adb shell input tap 428 358")
+    await run_adb_command("adb shell input tap 475 2142")
 
 async def fill_textbar(text):
     """Fills the text bar with the specified text."""
@@ -45,8 +45,7 @@ async def send_message():
 async def send_signal_message(message, executed):
     try:
         await launch_app()
-        if not executed:
-            await click_on_first_messager()
+        await click_on_first_messager()
         await fill_textbar(message)
         await send_message()
         return True
