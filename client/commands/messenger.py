@@ -18,20 +18,12 @@ async def run_adb_command(command):
     else:
         logging.error(f"Command failed: {stderr.decode().strip()}")
 
-    await asyncio.sleep(0.5)  # Small delay to ensure the command has time to execute
+    await asyncio.sleep(1)  # Small delay to ensure the command has time to execute
 
 async def start_messenger():
     """Launches the Messenger app."""
     await run_adb_command("adb shell input keyevent KEYCODE_HOME")
     await run_adb_command("adb shell am start -n com.facebook.orca/.auth.StartScreenActivity --activity-brought-to-front")
-
-async def stop_messenger():
-    """Stops the Messenger app."""
-    await run_adb_command("adb shell am force-stop com.facebook.orca")
-
-async def tap_first_groupchat():
-    """Taps the first group chat."""
-    await run_adb_command("adb shell input tap 125 800")
 
 async def tap_textbar():
     """Taps the text bar for input."""
@@ -54,8 +46,6 @@ async def click_send_button():
 async def send_messenger_message(message, executed):
     try:
         await start_messenger()
-        if not executed:
-            await tap_first_groupchat()
         await tap_textbar()
         await fill_textbar(message)
         await click_send_button()

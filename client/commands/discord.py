@@ -18,7 +18,7 @@ async def run_adb_command(command):
     else:
         logging.error(f"Command failed: {stderr.decode().strip()}")
 
-    await asyncio.sleep(0.5)  # Small delay to ensure the command has time to execute
+    await asyncio.sleep(1)  # Small delay to ensure the command has time to execute
 
 async def launch_app():
     """ Launches the Discord app. """

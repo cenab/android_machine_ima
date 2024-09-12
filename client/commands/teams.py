@@ -18,17 +18,17 @@ async def run_adb_command(command):
     else:
         logging.error(f"Command failed: {stderr.decode().strip()}")
 
-    await asyncio.sleep(0.5)  # Small delay to ensure the command has time to execute
+    await asyncio.sleep(1)  # Small delay to ensure the command has time to execute
 
 async def open_teams():
     """Launches the Teams app and handles the 'OK' button click if necessary."""
     await run_adb_command("adb shell input keyevent KEYCODE_HOME")
     await run_adb_command("adb shell am start -n com.microsoft.teams/com.microsoft.skype.teams.Launcher --activity-brought-to-front")
-    await run_adb_command("adb pull $(adb shell uiautomator dump | grep -oP '[^ ]+.xml') /tmp/view.xml")
+    # await run_adb_command("adb pull $(adb shell uiautomator dump | grep -oP '[^ ]+.xml') /tmp/view.xml")
     
-    coordinates_script =  """coords=$(perl -ne 'printf "%d %d\n", ($1+$3)/2, ($2+$4)/2 if /text="OK"[^>]*bounds="\[(\d+),(\d+)\]\[(\d+),(\d+)\]"/' /tmp/view.xml)"""
-    await run_adb_command(coordinates_script)
-    await run_adb_command("adb shell input tap $coords")
+    # coordinates_script =  """coords=$(perl -ne 'printf "%d %d\n", ($1+$3)/2, ($2+$4)/2 if /text="OK"[^>]*bounds="\[(\d+),(\d+)\]\[(\d+),(\d+)\]"/' /tmp/view.xml)"""
+    # await run_adb_command(coordinates_script)
+    # await run_adb_command("adb shell input tap $coords")
 
 async def click_second_conversation():
     """Clicks on the second conversation."""
