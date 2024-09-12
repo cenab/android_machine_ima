@@ -18,7 +18,7 @@ async def run_adb_command(command):
     else:
         logging.error(f"Command failed: {stderr.decode().strip()}")
 
-    await asyncio.sleep(1)  # Small delay to ensure the command has time to execute
+    await asyncio.sleep(2)  # Small delay to ensure the command has time to execute
 
 async def open_skype():
     """Launches the Skype app."""
@@ -49,8 +49,6 @@ async def click_send_button():
 async def send_skype_message(message, executed):
     try:
         await open_skype()
-        if not executed:
-            await click_second_conversation()
         await click_textbox()
         await fill_textbar(message)
         await click_send_button()
