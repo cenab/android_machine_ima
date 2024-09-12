@@ -44,7 +44,6 @@ async def send_message():
 
 async def send_telegram_message(message, executed):
     await launch_app()
-    if not executed:
-        await click_on_first_messager()
+    await click_on_first_messager()
     await fill_textbar(message)
     await send_message()
