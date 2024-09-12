@@ -33,7 +33,7 @@ async def fill_textbar(text):
     # Clear the current text (optional, based on your initial command)
     await run_adb_command("adb shell input keycombination 113 29 && adb shell input keyevent 67")
     # Replace spaces with "\ " to properly handle them in ADB shell input
-    formatted_text = text.replace(" ", "\\ ")
+    formatted_text = re.sub(r'[^a-zA-Z ]', '', text).replace(" ", "\\ ")
     # Send the formatted text to the device
     await run_adb_command(f'adb shell input text "{formatted_text}"')
 
