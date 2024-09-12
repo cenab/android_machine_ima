@@ -18,7 +18,7 @@ async def run_adb_command(command):
     else:
         logging.error(f"Command failed: {stderr.decode().strip()}")
 
-    await asyncio.sleep(1)  # Small delay to ensure the command has time to execute
+    await asyncio.sleep(2)  # Small delay to ensure the command has time to execute
 
 async def open_teams():
     """Launches the Teams app and handles the 'OK' button click if necessary."""
