@@ -27,7 +27,7 @@ async def start_messenger():
 
 async def tap_textbar():
     """Taps the text bar for input."""
-    await run_adb_command("adb shell input tap 626 2136")
+    await run_adb_command("adb shell input tap 550 2146")
 
 async def fill_textbar(text):
     """Fills the text bar with the specified text."""
@@ -44,12 +44,7 @@ async def click_send_button():
     await run_adb_command("adb shell input tap 1009 2136")
 
 async def send_messenger_message(message, executed):
-    try:
-        await start_messenger()
-        await tap_textbar()
-        await fill_textbar(message)
-        await click_send_button()
-        return True
-    except Exception as e:
-        logging.error(f"Failed to send message: {e}")
-        return False
+    await start_messenger()
+    await tap_textbar()
+    await fill_textbar(message)
+    await click_send_button()
