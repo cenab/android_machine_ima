@@ -27,7 +27,7 @@ async def launch_app():
 
 async def click_on_first_messager():
     """Simulates a tap on the screen at the specified coordinates."""
-    await run_adb_command("adb shell input tap 428 358")
+    await run_adb_command("adb shell input tap 283 2139")
 
 async def fill_textbar(text):
     """Fills the text bar with the specified text."""
