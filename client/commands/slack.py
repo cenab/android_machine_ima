@@ -35,11 +35,7 @@ async def fill_textbar(text):
     formatted_text = re.sub(r'[^a-zA-Z ]', '', text).replace(" ", "\\ ")
     # Send the formatted text to the device
     await run_adb_command(f'adb shell input text "{formatted_text}"')
-
-async def open_general_channel():
-    await run_adb_command("adb shell input tap 260 333")
-    await run_adb_command("adb shell input text 'general'")
-    await run_adb_command("adb shell input tap 420 335")
+    await asyncio.sleep(len(formatted_text) * 0.1)
 
 async def send_message():
     await run_adb_command("adb shell input tap 1000 2136")
