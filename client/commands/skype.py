@@ -31,6 +31,7 @@ async def click_second_conversation():
 
 async def click_textbox():
     """Clicks on the text box for input."""
+    await asyncio.sleep(2)
     await run_adb_command("adb shell input tap 340 2119")
 
 async def fill_textbar(text):
@@ -41,7 +42,7 @@ async def fill_textbar(text):
     formatted_text = re.sub(r'[^a-zA-Z ]', '', text).replace(" ", "\\ ")
     # Send the formatted text to the device
     await run_adb_command(f'adb shell input text "{formatted_text}"')
-    await asyncio.sleep(len(formatted_text) * 0.0025)
+    await asyncio.sleep(2)
 
 async def click_send_button():
     """Clicks the send button."""
