@@ -25,6 +25,7 @@ async def start_messenger():
     await run_adb_command("adb shell am start -n com.Slack/slack.features.home.HomeActivity --activity-brought-to-front")
 
 async def tap_textbar():
+    await asyncio.sleep(2)
     await run_adb_command("adb shell input tap 626 2136")
 
 async def fill_textbar(text):
@@ -35,7 +36,7 @@ async def fill_textbar(text):
     formatted_text = re.sub(r'[^a-zA-Z ]', '', text).replace(" ", "\\ ")
     # Send the formatted text to the device
     await run_adb_command(f'adb shell input text "{formatted_text}"')
-    await asyncio.sleep(len(formatted_text) * 0.0025)
+    await asyncio.sleep(2)
 
 async def send_message():
     await run_adb_command("adb shell input tap 1000 2136")
