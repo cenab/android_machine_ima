@@ -16,7 +16,7 @@ def assign_random_values(file_path):
     df = pd.read_excel(file_path)
     df['Number'] = [random.randint(1, 3) for _ in range(len(df))]
     df['IMA'] = [random.choice(['discord', 'messenger', 'signal', 'skype', 'slack', 'teams', 'telegram', 'rocketchat']) for _ in range(len(df))]
-    df['Wait Time (seconds)'] = [random.randint(0, 60) for _ in range(len(df))]
+    df['Wait Time (seconds)'] = [random.randint(15, 60) for _ in range(len(df))]
     return df
 
 def export_to_excel(df, output_file_path):

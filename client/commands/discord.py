@@ -59,9 +59,6 @@ async def send_discord_message(message, executed):
     """ Sends a message to the Discord channel. """
     try:
         await launch_app()
-        if not executed:
-            await tap_click_on_server()
-            await tap_click_on_channel()
         await tap_click_on_message_box()
         await fill_textbar(message)
         await click_send_button()
