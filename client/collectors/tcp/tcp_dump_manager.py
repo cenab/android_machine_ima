@@ -1,5 +1,6 @@
 import subprocess
 import time
+import uuid
 
 class TcpDumpManager:
     def __init__(self):
@@ -34,7 +35,13 @@ class TcpDumpManager:
 
     def start_tcpdump(self):
         """Start tcpdump to capture all network traffic in the background."""
-        command = "adb shell /data/local/tmp/tcpdump -i any -s 0 -w /sdcard/imas_all_tcpdump.pcap"
+        
+        # Generate a UUID for the filename to ensure uniqueness
+        unique_id = uuid.uuid4()
+        file_name = f"/sdcard/imas_all_tcpdump_{unique_id}.pcap"
+        
+        # Command to start tcpdump with the generated file name
+        command = f"adb shell /data/local/tmp/tcpdump -i any -s 0 -w {file_name}"
         
         try:
             # Start tcpdump as a background process
@@ -46,7 +53,7 @@ class TcpDumpManager:
 
             # Check if tcpdump started successfully
             if self.process.poll() is None:  # If the process is still running
-                print(f"tcpdump is running with PID: {self.process.pid}")
+                print(f"tcpdump is running with PID: {self.process.pid} and output file: {file_name}")
             else:
                 stderr_output = self.process.stderr.read().decode()
                 print(f"Failed to start tcpdump. Error: {stderr_output}")
