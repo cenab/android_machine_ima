@@ -80,7 +80,7 @@ async def post_message_to_the_chat(message: str, platform: str):
         'slack': send_slack_message,
         'teams': send_teams_message,
         'telegram': send_telegram_message,
-        'rocket': send_rocketchat_message
+        'rocketchat': send_rocketchat_message
     }
     if platform in platform_functions:
         result = await platform_functions[platform](message, executed)
