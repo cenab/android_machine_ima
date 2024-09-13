@@ -83,7 +83,7 @@ async def post_message_to_the_chat(message: str, platform: str):
         'rocketchat': send_rocketchat_message
     }
     if platform in platform_functions:
-        result = await platform_functions[platform](message, executed)
+        result = await platform_functions[platform](message[:70], executed)
         EXECUTED_LIST[platform] = True
         return result
     else:
