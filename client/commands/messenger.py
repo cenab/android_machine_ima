@@ -37,7 +37,7 @@ async def fill_textbar(text):
     formatted_text = re.sub(r'[^a-zA-Z ]', '', text).replace(" ", "\\ ")
     # Send the formatted text to the device
     await run_adb_command(f'adb shell input text "{formatted_text}"')
-    await asyncio.sleep(len(formatted_text) * 0.1)
+    await asyncio.sleep(len(formatted_text) * 0.0025)
 
 
 async def click_send_button():
