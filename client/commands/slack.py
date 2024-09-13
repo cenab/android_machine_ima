@@ -24,9 +24,6 @@ async def start_messenger():
     await run_adb_command("adb shell input keyevent KEYCODE_HOME")
     await run_adb_command("adb shell am start -n com.Slack/slack.features.home.HomeActivity --activity-brought-to-front")
 
-async def tap_first_groupchat():
-    await run_adb_command("adb shell input tap 125 800")
-
 async def tap_textbar():
     await run_adb_command("adb shell input tap 626 2136")
 
@@ -50,8 +47,6 @@ async def send_message():
 async def send_slack_message(message, executed):
     try:
         await start_messenger()
-        if not executed:
-            await open_general_channel()
         await tap_textbar()
         await fill_textbar(message)
         await send_message()
