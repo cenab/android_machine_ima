@@ -1,19 +1,23 @@
 import os
 import subprocess
 import time
+import uuid
 from multiprocessing import Process, Event
 
 class NetworkStatsCollector:
     def __init__(self):
+        # Adding UUID to each log file to ensure uniqueness
+        unique_id = uuid.uuid4()
+
         self.apps = {
-            "com.Slack": "Slack_output.txt",
-            "com.discord": "Discord_output.txt",
-            "com.microsoft.teams": "Teams_output.txt",
-            "com.facebook.orca": "Messenger_output.txt",
-            "org.telegram.messenger.web": "Telegram_output.txt",
-            "org.thoughtcrime.securesms": "Signal_output.txt",
-            "com.skype.raider": "Skype_output.txt",
-            "chat.rocket.android": "RocketChat_output.txt"
+            "com.Slack": f"Slack_output_{unique_id}.txt",
+            "com.discord": f"Discord_output_{unique_id}.txt",
+            "com.microsoft.teams": f"Teams_output_{unique_id}.txt",
+            "com.facebook.orca": f"Messenger_output_{unique_id}.txt",
+            "org.telegram.messenger.web": f"Telegram_output_{unique_id}.txt",
+            "org.thoughtcrime.securesms": f"Signal_output_{unique_id}.txt",
+            "com.skype.raider": f"Skype_output_{unique_id}.txt",
+            "chat.rocket.android": f"RocketChat_output_{unique_id}.txt"
         }
 
         self.unique_ports = set()
@@ -21,7 +25,7 @@ class NetworkStatsCollector:
         self.excluded_ports = {'443'}
         self.stop_event = Event()
         self.process = None
-        self.consolidated_output = "consolidated_network_stats.txt"
+        self.consolidated_output = f"consolidated_network_stats_{unique_id}.txt"
 
     def ensure_output_files_exist(self):
         """Ensure all output files exist."""
@@ -92,14 +96,14 @@ class NetworkStatsCollector:
             wireshark_filter = self.generate_wireshark_filter()
 
             # Write the unique ports and IPs to their respective files
-            with open("unique_ports.txt", 'w') as ports_file:
+            with open(f"unique_ports_{uuid.uuid4()}.txt", 'w') as ports_file:
                 ports_file.write("\n".join(sorted(self.unique_ports, key=int)) + "\n")
             
-            with open("unique_ips.txt", 'w') as ips_file:
+            with open(f"unique_ips_{uuid.uuid4()}.txt", 'w') as ips_file:
                 ips_file.write("\n".join(sorted(self.unique_ips)) + "\n")
             
             # Write the Wireshark filter to a file
-            with open("wireshark_filter.txt", 'w') as filter_file:
+            with open(f"wireshark_filter_{uuid.uuid4()}.txt", 'w') as filter_file:
                 filter_file.write(wireshark_filter + "\n")
 
             time.sleep(60)  # Adjust the interval as needed
